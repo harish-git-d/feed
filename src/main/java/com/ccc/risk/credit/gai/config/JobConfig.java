@@ -1,12 +1,9 @@
 package com.ccc.risk.credit.gai.config;
 
+import com.ccc.risk.credit.gai.service.DatabaseQueryService;
 import com.ccc.risk.credit.gai.service.FeedFileNamingService;
 import com.ccc.risk.credit.gai.service.FileWriterService;
-import com.ccc.risk.credit.gai.service.SampleDataFactory;
-import com.ccc.risk.credit.gai.tasklet.GenerateCategoryFileTasklet;
-import com.ccc.risk.credit.gai.tasklet.GenerateControlFileTasklet;
-import com.ccc.risk.credit.gai.tasklet.LoadFeedDefinitionTasklet;
-import com.ccc.risk.credit.gai.tasklet.TransferFilesTasklet;
+import com.ccc.risk.credit.gai.tasklet.*;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
@@ -95,33 +92,31 @@ public class JobConfig {
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public GenerateCategoryFileTasklet eventTasklet(SampleDataFactory sampleDataFactory,
+    public GenerateCategoryFileTasklet eventTasklet(DatabaseQueryService databaseQueryService,
                                                     FeedFileNamingService fileNamingService,
-                                                    FileWriterService fileWriterService) {
-        return createCategoryFileTasklet(sampleDataFactory, fileNamingService, fileWriterService, "EVENT");
+                                                    FileWriterService fileWriterService,
+                                                    FeedProperties feedProperties) {
+        return new GenerateCategoryFileTasklet(fileNamingService, fileWriterService,
+                databaseQueryService, feedProperties, "EVENT");
     }
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public GenerateCategoryFileTasklet recordTasklet(SampleDataFactory sampleDataFactory,
+    public GenerateCategoryFileTasklet recordTasklet(DatabaseQueryService databaseQueryService,
                                                      FeedFileNamingService fileNamingService,
-                                                     FileWriterService fileWriterService) {
-        return createCategoryFileTasklet(sampleDataFactory, fileNamingService, fileWriterService, "RECORD");
+                                                     FileWriterService fileWriterService,
+                                                     FeedProperties feedProperties) {
+        return new GenerateCategoryFileTasklet(fileNamingService, fileWriterService,
+                databaseQueryService, feedProperties, "RECORD");
     }
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public GenerateCategoryFileTasklet attributeTasklet(SampleDataFactory sampleDataFactory,
+    public GenerateCategoryFileTasklet attributeTasklet(DatabaseQueryService databaseQueryService,
                                                         FeedFileNamingService fileNamingService,
-                                                        FileWriterService fileWriterService) {
-        return createCategoryFileTasklet(sampleDataFactory, fileNamingService, fileWriterService, "ATTRIBUTE");
-    }
-
-    private GenerateCategoryFileTasklet createCategoryFileTasklet(SampleDataFactory sampleDataFactory,
-                                                                  FeedFileNamingService fileNamingService,
-                                                                  FileWriterService fileWriterService,
-                                                                  String category) {
-        return new GenerateCategoryFileTasklet(
-                fileNamingService, fileWriterService, sampleDataFactory, category);
+                                                        FileWriterService fileWriterService,
+                                                        FeedProperties feedProperties) {
+        return new GenerateCategoryFileTasklet(fileNamingService, fileWriterService,
+                databaseQueryService, feedProperties, "ATTRIBUTE");
     }
 }
