@@ -1,0 +1,23 @@
+spring:
+  datasource:
+    url: jdbc:oracle:thin:@dev-db-host:1521:DEVDB
+    username: gai_dev_user
+    password: dev_password
+    hikari:
+      maximum-pool-size: 10
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+
+gai:
+  output-directory: ./dev-output
+  sftp:
+    enabled: false
+
+logging:
+  level:
+    com.ccc.risk.credit.gai: DEBUG
+    org.springframework.jdbc: DEBUG
+    org.hibernate.SQL: DEBUG

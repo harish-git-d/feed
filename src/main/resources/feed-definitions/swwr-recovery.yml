@@ -1,0 +1,38 @@
+feedName: swwr-recovery
+moduleName: SWWRRECOVERY
+sourceSystemCsi: "161534"
+sourceSystemName: "SCEF"
+recordType: trade
+attributeName: "SWWR Recovery"
+adjustmentType: "Risk User Adjustment - SWWR Recovery - Trade"
+attributeDescription: "SWWR Recovery adjustment"
+delimiter: "|"
+headerTemplate: "H|attribute_names"
+trailerTemplate: "T|{cobDate}|{recordCount}"
+recordFields:
+  - H
+  - ADJ_INVENTORY_ID
+  - ADJUSTMENT_UPLOAD_ID
+  - ADJUSTMENT_TYPE
+  - EFFECTIVE_DATE
+  - POSTED_DATE
+  - CHECKER_SOEID
+  - MAKER_SOEID
+  - ATTRIBUTE_NAME
+  - OLD_VALUE
+  - NEW_VALUE
+  - UITID
+  - ORIGINAL_CSI
+  - ADJUSTMENT_POSTING_STATUS
+  - TRANSACTION_CCY
+  - ADJUSTMENT_METHOD
+  - REASON_CODE
+  - SUB_REASON_CODE
+  - EVENT_STATUS
+  - RECURRENCE
+  - ADJUSTING_SYSTEM
+  - FREQUENCY
+  - REQUESTOR_SOEID
+  - STANDARD_ACCOUNT
+  - FRS_BU
+  - BALANCE_TYPE

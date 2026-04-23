@@ -1,0 +1,37 @@
+feedName: pse-exposure
+moduleName: PSE
+sourceSystemCsi: "161534"
+sourceSystemName: "SCEF"
+recordType: facility
+attributeName: "PSE"
+adjustmentType: "Risk User Adjustment - PSE Exposure - Facility"
+attributeDescription: "PSE Exposure adjustment for facilities"
+delimiter: "|"
+headerTemplate: "H|attribute_names"
+trailerTemplate: "T|{cobDate}|{recordCount}"
+recordFields:
+  - H
+  - ADJ_INVENTORY_ID
+  - ADJUSTMENT_UPLOAD_ID
+  - ADJUSTMENT_TYPE
+  - EFFECTIVE_DATE
+  - POSTED_DATE
+  - CHECKER_SOEID
+  - MAKER_SOEID
+  - ATTRIBUTE_NAME
+  - OLD_VALUE
+  - NEW_VALUE
+  - ORIGINAL_CSI
+  - ADJUSTMENT_POSTING_STATUS
+  - TRANSACTION_CCY
+  - ADJUSTMENT_METHOD
+  - REASON_CODE
+  - SUB_REASON_CODE
+  - EVENT_STATUS
+  - RECURRENCE
+  - ADJUSTING_SYSTEM
+  - FREQUENCY
+  - REQUESTOR_SOEID
+  - STANDARD_ACCOUNT
+  - FRS_BU
+  - BALANCE_TYPE

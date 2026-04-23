@@ -1,0 +1,99 @@
+spring:
+  application:
+    name: gai-batch-feed
+
+  # Single DataSource Configuration (Application Data Only)
+  datasource:
+    driver-class-name: oracle.jdbc.OracleDriver
+    url: ${DB_URL:jdbc:oracle:thin:@localhost:1521:ORCL}
+    username: ${DB_USERNAME:gai_user}
+    password: ${DB_PASSWORD:changeit}
+    hikari:
+      pool-name: ApplicationHikariPool
+      minimum-idle: 5
+      maximum-pool-size: 20
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      auto-commit: true
+      connection-test-query: SELECT 1 FROM DUAL
+      leak-detection-threshold: 60000
+      connection-init-sql: ALTER SESSION SET NLS_DATE_FORMAT='YYYY-MM-DD HH24:MI:SS'
+
+  # JPA Configuration
+  jpa:
+    database-platform: org.hibernate.dialect.Oracle12cDialect
+    show-sql: false
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+        jdbc:
+          batch_size: 50
+          fetch_size: 100
+        order_inserts: true
+        order_updates: true
+        generate_statistics: false
+
+  # Spring Batch Configuration - No Database Tables
+  batch:
+    jdbc:
+      initialize-schema: never
+    job:
+      enabled: false
+
+# GAI Feed Configuration
+gai:
+  source-system-csi: ${GAI_SOURCE_SYSTEM_CSI:SCEF}
+  source-system-name: ${GAI_SOURCE_SYSTEM_NAME:SCEF}
+  app-short-name: ${GAI_APP_SHORT_NAME:SCEF}
+  region-instance: ${GAI_REGION_INSTANCE:NA}
+  source-indicator: ${GAI_SOURCE_INDICATOR:S}
+  frequency: ${GAI_FREQUENCY:D}
+  file-type-indicator: ${GAI_FILE_TYPE_INDICATOR:F}
+  output-directory: ${GAI_OUTPUT_DIR:./output}
+  feed-name: ${GAI_FEED_NAME:}
+  cob-date: ${GAI_COB_DATE:}
+  file-timestamp: ${GAI_FILE_TIMESTAMP:}
+  gzip-enabled: ${GAI_GZIP_ENABLED:true}
+
+  sftp:
+    enabled: ${GAI_SFTP_ENABLED:false}
+    host: ${GAI_SFTP_HOST:sftp.example.com}
+    port: ${GAI_SFTP_PORT:22}
+    username: ${GAI_SFTP_USERNAME:}
+    password: ${GAI_SFTP_PASSWORD:}
+    remote-directory: ${GAI_SFTP_REMOTE_DIR:/upload}
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    com.ccc.risk.credit.gai: DEBUG
+    org.springframework.batch: INFO
+    org.springframework.jdbc: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    com.zaxxer.hikari: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/gai-batch-feed.log
+    max-size: 10MB
+    max-history: 30
+
+# Management & Actuator
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,env
+  endpoint:
+    health:
+      show-details: when-authorized
