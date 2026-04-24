@@ -47,17 +47,30 @@ public class InMemoryJobRepository implements JobRepository {
         return instance;
     }
 
+    @Override
     public boolean isJobInstanceExists(String jobName, JobParameters jobParameters) {
         return jobInstances.values().stream()
                 .anyMatch(i -> i.getJobName().equals(jobName));
     }
 
+    @Override
     public JobInstance getJobInstance(String jobName, JobParameters jobParameters) {
         return jobInstances.values().stream()
                 .filter(i -> i.getJobName().equals(jobName))
                 .findFirst()
                 .orElse(null);
     }
+
+
+    public JobInstance getJobInstance(long instanceId) {
+        return jobInstances.get(instanceId);
+    }
+
+
+    public JobInstance getJobInstance(JobExecution jobExecution) {
+        return jobExecution.getJobInstance();
+    }
+
 
     public List<JobInstance> getJobInstances(String jobName, int start, int count) {
         return jobInstances.values().stream()
@@ -67,9 +80,11 @@ public class InMemoryJobRepository implements JobRepository {
                 .toList();
     }
 
+    @Override
     public List<JobInstance> findJobInstancesByName(String jobName, int start, int count) {
         return getJobInstances(jobName, start, count);
     }
+
 
     public long getJobInstanceCount(String jobName) {
         return jobInstances.values().stream()
@@ -84,8 +99,8 @@ public class InMemoryJobRepository implements JobRepository {
     @Override
     public JobExecution createJobExecution(String jobName, JobParameters jobParameters)
             throws JobExecutionAlreadyRunningException,
-            JobRestartException,
-            JobInstanceAlreadyCompleteException {
+                   JobRestartException,
+                   JobInstanceAlreadyCompleteException {
 
         JobInstance instance = getJobInstance(jobName, jobParameters);
         if (instance == null) {
@@ -93,6 +108,7 @@ public class InMemoryJobRepository implements JobRepository {
         }
         return createJobExecution(instance, jobParameters, null);
     }
+
 
     public JobExecution createJobExecution(JobInstance jobInstance,
                                            JobParameters jobParameters,
@@ -123,6 +139,35 @@ public class InMemoryJobRepository implements JobRepository {
                 .filter(e -> e.getJobInstance().getJobName().equals(jobName))
                 .max(Comparator.comparing(JobExecution::getId))
                 .orElse(null);
+    }
+
+    public Set<JobExecution> findRunningJobExecutions(String jobName) {
+        Set<JobExecution> running = new HashSet<>();
+        for (JobExecution e : jobExecutions.values()) {
+            if (e.getJobInstance().getJobName().equals(jobName)
+                    && e.isRunning()) {
+                running.add(e);
+            }
+        }
+        return running;
+    }
+
+    public JobExecution getJobExecution(long executionId) {
+        return jobExecutions.get(executionId);
+    }
+
+    public List<JobExecution> getJobExecutions(JobInstance jobInstance) {
+        return jobExecutions.values().stream()
+                .filter(e -> e.getJobInstance().getId().equals(jobInstance.getId()))
+                .toList();
+    }
+
+    public List<JobExecution> findJobExecutionsByJobInstanceId(long instanceId, int start, int count) {
+        return jobExecutions.values().stream()
+                .filter(e -> e.getJobInstance().getId() == instanceId)
+                .skip(start)
+                .limit(count)
+                .toList();
     }
 
     // -------------------------------------------------------------------------
@@ -158,8 +203,8 @@ public class InMemoryJobRepository implements JobRepository {
     public StepExecution getLastStepExecution(JobInstance jobInstance, String stepName) {
         return stepExecutions.values().stream()
                 .filter(s -> s.getJobExecution().getJobInstance().getId()
-                        .equals(jobInstance.getId())
-                        && s.getStepName().equals(stepName))
+                              .equals(jobInstance.getId())
+                          && s.getStepName().equals(stepName))
                 .max(Comparator.comparing(StepExecution::getId))
                 .orElse(null);
     }
@@ -168,9 +213,15 @@ public class InMemoryJobRepository implements JobRepository {
     public long getStepExecutionCount(JobInstance jobInstance, String stepName) {
         return stepExecutions.values().stream()
                 .filter(s -> s.getJobExecution().getJobInstance().getId()
-                        .equals(jobInstance.getId())
-                        && s.getStepName().equals(stepName))
+                              .equals(jobInstance.getId())
+                          && s.getStepName().equals(stepName))
                 .count();
+    }
+
+    public Collection<StepExecution> getStepExecutions(JobExecution jobExecution) {
+        return stepExecutions.values().stream()
+                .filter(s -> s.getJobExecution().getId().equals(jobExecution.getId()))
+                .toList();
     }
 
     // -------------------------------------------------------------------------
