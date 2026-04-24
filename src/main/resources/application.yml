@@ -2,8 +2,8 @@ spring:
   application:
     name: gai-batch-feed
 
-  # SCEF Oracle datasource — application data queries only.
-  # Spring Batch metadata is stored in H2 (see DataSourceConfig).
+  # SCEF Oracle datasource — used only for SCEF data queries (SELECT only).
+  # Spring Batch metadata is stored entirely in-memory (no tables anywhere).
   datasource:
     driver-class-name: oracle.jdbc.OracleDriver
     url:      ${DB_URL:jdbc:oracle:thin:@localhost:1521/ORCL}
@@ -19,12 +19,9 @@ spring:
       connection-test-query: SELECT 1 FROM DUAL
 
   batch:
-    jdbc:
-      # "never" = Spring Boot will not attempt to create Batch tables in Oracle.
-      # Batch metadata tables are created automatically in H2 by DataSourceConfig.
-      initialize-schema: never
     job:
       enabled: false   # Jobs launched programmatically via CommandLineRunner
+    # No jdbc config — Spring Batch uses InMemoryJobRepository, no tables at all
 
 # ─── GAI Feed Properties ────────────────────────────────────────────────────
 gai:
@@ -53,9 +50,9 @@ gai:
 
   notification:
     enabled:   false
-    from:
+    from:      scef-gai-feed@ccc.com
     to:        ${GAI_NOTIFY_TO:}
-    smtp-host: ${MAIL_HOST:mailrelay.com}
+    smtp-host: ${MAIL_HOST:mailrelay.ccc.com}
     smtp-port: ${MAIL_PORT:25}
 
 # ─── Logging ────────────────────────────────────────────────────────────────

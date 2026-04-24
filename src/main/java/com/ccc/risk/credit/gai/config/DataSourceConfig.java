@@ -3,62 +3,27 @@ package com.ccc.risk.credit.gai.config;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.batch.BatchDataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 
 import javax.sql.DataSource;
 
 /**
- * Manually configures two datasources.
+ * Configures the single Oracle datasource for SCEF data queries.
  *
- * <p>Spring Boot's {@code DataSourceAutoConfiguration} is excluded in
- * {@link com.ccc.risk.credit.gai.FeedBatchApplication} to prevent Boot
- * from creating a third conflicting datasource bean from
- * {@code spring.datasource.*} properties.
+ * <p>Spring Batch metadata no longer uses any datasource — it is stored
+ * entirely in-memory via {@link InMemoryJobRepository} in {@link BatchConfig}.
+ * H2 has been removed from the project entirely.
  *
- * <ul>
- *   <li><b>batchDataSource</b> — H2 in-memory, tagged {@code @BatchDataSource}.
- *       Spring Batch metadata tables auto-created from {@code schema-h2.sql}
- *       bundled in {@code spring-batch-core.jar}. No Oracle permissions needed.</li>
- *   <li><b>scefDataSource</b> — Oracle HikariCP, {@code @Primary}.
- *       Used for all SCEF data queries. Needs only SELECT on SCEF views/tables.</li>
- * </ul>
+ * <p>Only SELECT privileges on SCEF views/tables are required.
+ * No DDL permissions needed anywhere.
  */
 @Slf4j
 @Configuration
 public class DataSourceConfig {
-
-    // -------------------------------------------------------------------------
-    // H2 — Spring Batch metadata (no Oracle permissions needed)
-    // -------------------------------------------------------------------------
-
-    @Bean
-    @BatchDataSource
-    public DataSource batchDataSource() {
-        log.info("Initialising Spring Batch metadata store (H2 in-memory)");
-        return new EmbeddedDatabaseBuilder()
-                .setType(EmbeddedDatabaseType.H2)
-                .setName("batchDb")
-                .addScript("classpath:org/springframework/batch/core/schema-h2.sql")
-                .build();
-    }
-
-    @Bean("batchTransactionManager")
-    public JdbcTransactionManager batchTransactionManager(
-            @Qualifier("batchDataSource") DataSource batchDataSource) {
-        return new JdbcTransactionManager(batchDataSource);
-    }
-
-    // -------------------------------------------------------------------------
-    // Oracle — SCEF application data (SELECT only)
-    // -------------------------------------------------------------------------
 
     @Bean
     @Primary
@@ -89,9 +54,7 @@ public class DataSourceConfig {
 
     @Bean
     @Primary
-    @Qualifier("scefTransactionManager")
-    public JdbcTransactionManager scefTransactionManager(
-            @Qualifier("scefDataSource") DataSource scefDataSource) {
+    public JdbcTransactionManager scefTransactionManager(DataSource scefDataSource) {
         return new JdbcTransactionManager(scefDataSource);
     }
 }

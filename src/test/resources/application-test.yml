@@ -1,15 +1,10 @@
 spring:
   datasource:
-    # In tests, point the "SCEF Oracle" datasource at H2 as well
-    # (same in-memory DB, different schema from Batch metadata DB)
     driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:scefTestDb;DB_CLOSE_DELAY=-1;MODE=Oracle
     username: sa
     password:
-
   batch:
-    jdbc:
-      initialize-schema: never  # H2 Batch schema created by DataSourceConfig
     job:
       enabled: false
 
