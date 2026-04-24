@@ -1,13 +1,17 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=Oracle
+    # In tests, point the "SCEF Oracle" datasource at H2 as well
+    # (same in-memory DB, different schema from Batch metadata DB)
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:scefTestDb;DB_CLOSE_DELAY=-1;MODE=Oracle
     username: sa
     password:
-    driver-class-name: org.h2.Driver
 
   batch:
     jdbc:
-      initialize-schema: always   # Auto-create Batch metadata tables in H2
+      initialize-schema: never  # H2 Batch schema created by DataSourceConfig
+    job:
+      enabled: false
 
 gai:
   source-system-csi:   "161534"
@@ -21,6 +25,8 @@ gai:
   feed-name:           stress-exposure
   cob-date:            "20251231"
   file-timestamp:      "20260122144002"
-  gzip-enabled:        false   # Easier to inspect in tests
+  gzip-enabled:        false
   sftp:
+    enabled: false
+  notification:
     enabled: false

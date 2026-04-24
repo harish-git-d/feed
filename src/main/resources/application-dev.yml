@@ -1,22 +1,25 @@
 spring:
   datasource:
-    url: jdbc:oracle:thin:@DEV:1521/
+    url:      jdbc:oracle:thin:@:1521/
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     hikari:
       maximum-pool-size: 10
 
-  batch:
-    jdbc:
-      initialize-schema: always   # Create Batch tables in H2/DEV automatically
+  # initialize-schema intentionally omitted here — inherited as "never" from
+  # application.yml. H2 Batch schema is auto-created by DataSourceConfig.
 
 gai:
   output-directory: ./dev-output
+  gzip-enabled: false    # easier to inspect files during development
   sftp:
+    enabled: false       # no SFTP in dev — files stay local
+
+  notification:
     enabled: false
 
 logging:
   level:
     com.ccc.risk.credit.gai: DEBUG
     org.springframework.batch: DEBUG
-    org.springframework.jdbc: DEBUG
+    org.springframework.jdbc.core: DEBUG   # log all SQL + params
