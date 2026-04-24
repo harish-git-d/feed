@@ -5,35 +5,25 @@ sourceSystemName: "SCEF"
 recordType: trade
 attributeName: "OET"
 adjustmentType: "Risk User Adjustment - OET Flag - Trade"
-attributeDescription: "Function to be used to request approval for OET trades with non-professional counterparties to benefit PSE/FSLB tenor reduction and PSB amount"
+attributeDescription: "OET Flag adjustment - AdjustmentAmount and AbsAdjustmentAmount"
 delimiter: "|"
-headerTemplate: "H|attribute_names"
 trailerTemplate: "T|{cobDate}|{recordCount}"
 recordFields:
-  - H
-  - ADJ_INVENTORY_ID
-  - ADJUSTMENT_UPLOAD_ID
-  - ADJUSTMENT_TYPE
+  - ATTRIBUTE_ADJUSTMENT_ID
+  - RECORD_ID
+  - ATTRIBUTE_NAME
+  - NEW_VALUE
   - EFFECTIVE_DATE
   - POSTED_DATE
   - CHECKER_SOEID
   - MAKER_SOEID
-  - ATTRIBUTE_NAME
-  - ADJUSTMENT_AMOUNT
-  - ABS_ADJUSTMENT_AMOUNT
-  - UITID
-  - ORIGINAL_CSI
-  - ADJUSTMENT_POSTING_STATUS
-  - TRANSACTION_CCY
   - ADJUSTMENT_METHOD
+  - ADJUSTMENT_TYPE
   - REASON_CODE
-  - SUB_REASON_CODE
-  - EVENT_STATUS
-  - RECURRENCE
   - ADJUSTING_SYSTEM
   - FREQUENCY
   - REQUESTOR_SOEID
-  - STANDARD_ACCOUNT
-  - FRS_BU
-  - BALANCE_TYPE
-  - ENTERPRISE_PRODUCT_TAXONOMY
+  - COB_DATE
+  - TRANSACTION_CCY
+  - ADJUSTMENT_POSTING_STATUS
+  - UITID

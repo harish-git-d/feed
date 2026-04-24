@@ -2,98 +2,71 @@ spring:
   application:
     name: gai-batch-feed
 
-  # Single DataSource Configuration (Application Data Only)
   datasource:
     driver-class-name: oracle.jdbc.OracleDriver
-    url: ${DB_URL:jdbc:oracle:thin:@localhost:1521:ORCL}
+    url: ${DB_URL:jdbc:oracle:thin:@localhost:1521/ORCL}
     username: ${DB_USERNAME:gai_user}
     password: ${DB_PASSWORD:changeit}
     hikari:
-      pool-name: ApplicationHikariPool
-      minimum-idle: 5
-      maximum-pool-size: 20
+      pool-name: GaiBatchPool
+      minimum-idle: 2
+      maximum-pool-size: 10
       connection-timeout: 30000
       idle-timeout: 600000
       max-lifetime: 1800000
-      auto-commit: true
       connection-test-query: SELECT 1 FROM DUAL
-      leak-detection-threshold: 60000
-      connection-init-sql: ALTER SESSION SET NLS_DATE_FORMAT='YYYY-MM-DD HH24:MI:SS'
 
-  # JPA Configuration
-  jpa:
-    database-platform: org.hibernate.dialect.Oracle12cDialect
-    show-sql: false
-    hibernate:
-      ddl-auto: none
-      naming:
-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
-    properties:
-      hibernate:
-        format_sql: true
-        use_sql_comments: true
-        jdbc:
-          batch_size: 50
-          fetch_size: 100
-        order_inserts: true
-        order_updates: true
-        generate_statistics: false
-
-  # Spring Batch Configuration - No Database Tables
+  # Spring Batch 5 auto-configures JobRepository from the primary DataSource.
+  # initialize-schema: never means Batch tables must be pre-created in Oracle
+  # (run spring-batch-core-x.x.x-schema-oracle.sql once per environment).
   batch:
     jdbc:
       initialize-schema: never
     job:
-      enabled: false
+      enabled: false   # Jobs launched programmatically via CommandLineRunner
 
-# GAI Feed Configuration
+# ─── GAI Feed Properties ────────────────────────────────────────────────────
 gai:
-  source-system-csi: ${GAI_SOURCE_SYSTEM_CSI:SCEF}
-  source-system-name: ${GAI_SOURCE_SYSTEM_NAME:SCEF}
-  app-short-name: ${GAI_APP_SHORT_NAME:SCEF}
-  region-instance: ${GAI_REGION_INSTANCE:NA}
-  source-indicator: ${GAI_SOURCE_INDICATOR:S}
-  frequency: ${GAI_FREQUENCY:D}
-  file-type-indicator: ${GAI_FILE_TYPE_INDICATOR:F}
-  output-directory: ${GAI_OUTPUT_DIR:./output}
-  feed-name: ${GAI_FEED_NAME:}
-  cob-date: ${GAI_COB_DATE:}
-  file-timestamp: ${GAI_FILE_TIMESTAMP:}
-  gzip-enabled: ${GAI_GZIP_ENABLED:true}
+  # File naming components — produce: 161534_CRC_SCEF-{module}_N_{cat}_DLY_F_SRC_{cob}_{ts}.dat.gz
+  source-system-csi:    ${GAI_SOURCE_SYSTEM_CSI:161534}
+  source-system-name:   ${GAI_SOURCE_SYSTEM_NAME:SCEF}
+  app-short-name:       ${GAI_APP_SHORT_NAME:CRC_SCEF}
+  region-instance:      ${GAI_REGION_INSTANCE:N}
+  source-indicator:     ${GAI_SOURCE_INDICATOR:SRC}
+  frequency:            ${GAI_FREQUENCY:DLY}
+  file-type-indicator:  ${GAI_FILE_TYPE_INDICATOR:F}
+
+  # Runtime parameters (must be provided per-run)
+  output-directory:     ${GAI_OUTPUT_DIR:./output}
+  feed-name:            ${GAI_FEED_NAME:}
+  cob-date:             ${GAI_COB_DATE:}
+  file-timestamp:       ${GAI_FILE_TIMESTAMP:}
+  gzip-enabled:         ${GAI_GZIP_ENABLED:true}
 
   sftp:
-    enabled: ${GAI_SFTP_ENABLED:false}
-    host: ${GAI_SFTP_HOST:sftp.example.com}
-    port: ${GAI_SFTP_PORT:22}
-    username: ${GAI_SFTP_USERNAME:}
-    password: ${GAI_SFTP_PASSWORD:}
-    remote-directory: ${GAI_SFTP_REMOTE_DIR:/upload}
+    enabled:            ${GAI_SFTP_ENABLED:false}
+    host:               ${GAI_SFTP_HOST:}
+    port:               ${GAI_SFTP_PORT:22}
+    username:           ${GAI_SFTP_USERNAME:}
+    password:           ${GAI_SFTP_PASSWORD:}
+    private-key-path:   ${GAI_SFTP_KEY_PATH:}
+    known-hosts-path:   ${GAI_SFTP_KNOWN_HOSTS:}
+    remote-directory:   ${GAI_SFTP_REMOTE_DIR:}
 
-# Logging Configuration
+  notification:
+    enabled:  false
+    from:     scef-gai-feed@citi.com
+    to:       ${GAI_NOTIFY_TO:}
+    smtp-host: ${MAIL_HOST:mailrelay.citi.com}
+    smtp-port: ${MAIL_PORT:25}
+
+# ─── Logging ────────────────────────────────────────────────────────────────
 logging:
   level:
     root: INFO
     com.ccc.risk.credit.gai: DEBUG
     org.springframework.batch: INFO
-    org.springframework.jdbc: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-    com.zaxxer.hikari: INFO
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
-    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [%logger{36}] - %msg%n"
   file:
     name: logs/gai-batch-feed.log
-    max-size: 10MB
-    max-history: 30
-
-# Management & Actuator
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,metrics,env
-  endpoint:
-    health:
-      show-details: when-authorized

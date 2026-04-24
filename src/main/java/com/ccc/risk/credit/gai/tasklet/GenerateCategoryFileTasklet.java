@@ -3,6 +3,7 @@ package com.ccc.risk.credit.gai.tasklet;
 import com.ccc.risk.credit.gai.config.FeedProperties;
 import com.ccc.risk.credit.gai.domain.FeedDefinition;
 import com.ccc.risk.credit.gai.domain.FeedRecord;
+import com.ccc.risk.credit.gai.domain.FileMetadata;
 import com.ccc.risk.credit.gai.service.DatabaseQueryService;
 import com.ccc.risk.credit.gai.service.FeedFileNamingService;
 import com.ccc.risk.credit.gai.service.FileWriterService;
@@ -10,66 +11,102 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Generates one data file (EVENT, RECORD, or ATTRIBUTE) for the active feed.
+ *
+ * <p>Exception handling:
+ * <ul>
+ *   <li>Missing {@code feedDefinition} context → hard fail with clear message</li>
+ *   <li>DB query failure → wrapped with feed/category context and rethrown</li>
+ *   <li>File write failure → wrapped with feed/category context and rethrown</li>
+ * </ul>
+ *
+ * <p>On any failure the {@link FeedJobExecutionListener} (job-level) will
+ * delete all partially-written files from this run.
+ */
 @Slf4j
-@Component
 public class GenerateCategoryFileTasklet implements Tasklet {
 
     private final FeedFileNamingService fileNamingService;
-    private final FileWriterService fileWriterService;
-    private final DatabaseQueryService databaseQueryService;
-    private final FeedProperties feedProperties;
-    private final String category;
+    private final FileWriterService     fileWriterService;
+    private final DatabaseQueryService  databaseQueryService;
+    private final FeedProperties        feedProperties;
+    private final String                category;
 
     public GenerateCategoryFileTasklet(
             FeedFileNamingService fileNamingService,
             FileWriterService fileWriterService,
             DatabaseQueryService databaseQueryService,
             FeedProperties feedProperties,
-            @Value("${file.category:EVENT}") String category) {
-        this.fileNamingService = fileNamingService;
-        this.fileWriterService = fileWriterService;
+            String category) {
+        this.fileNamingService    = fileNamingService;
+        this.fileWriterService    = fileWriterService;
         this.databaseQueryService = databaseQueryService;
-        this.feedProperties = feedProperties;
-        this.category = category;
+        this.feedProperties       = feedProperties;
+        this.category             = category;
     }
 
     @Override
-    public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-        log.info("Generating {} file", category);
+    @SuppressWarnings("unchecked")
+    public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+            throws Exception {
 
-        // Get feed definition from job execution context
-        FeedDefinition feedDefinition = (FeedDefinition) chunkContext.getStepContext()
-                .getJobExecutionContext()
-                .get("feedDefinition");
+        String feedName = feedProperties.getFeedName();
+        String cobDate  = feedProperties.getCobDate();
 
-        // Query database for records
-        List<FeedRecord> records = databaseQueryService.executeQuery(
-                feedDefinition,
-                category,
-                feedProperties.getCobDate()
-        );
+        log.info("[{}][{}] Generating {} file for cobDate={}",
+                feedName, category, category, cobDate);
 
-        // Generate file name
-        String fileName = fileNamingService.generateDataFileName(category);
+        ExecutionContext jobCtx = chunkContext.getStepContext()
+                .getStepExecution().getJobExecution().getExecutionContext();
 
-        // Write records to file
-        fileWriterService.writeDataFile(fileName, records, feedDefinition);
+        // --- Retrieve feed definition ---
+        FeedDefinition feedDefinition = (FeedDefinition) jobCtx.get("feedDefinition");
+        if (feedDefinition == null) {
+            throw new IllegalStateException(
+                "feedDefinition not found in JobExecutionContext. "
+                + "Ensure LoadFeedDefinitionTasklet ran before this step.");
+        }
 
-        log.info("Generated {} file with {} records: {}", category, records.size(), fileName);
+        // --- Query database ---
+        List<FeedRecord> records;
+        try {
+            records = databaseQueryService.executeQuery(feedDefinition, category, cobDate);
+        } catch (Exception e) {
+            throw new IllegalStateException(
+                String.format("[%s][%s][cobDate=%s] Database query failed: %s",
+                        feedName, category, cobDate, e.getMessage()), e);
+        }
 
-        // Store file name in context for control file generation
-        chunkContext.getStepContext()
-                .getJobExecutionContext()
-                .put(category.toLowerCase() + "FileName", fileName);
-        chunkContext.getStepContext()
-                .getJobExecutionContext()
-                .put(category.toLowerCase() + "RecordCount", records.size());
+        log.info("[{}][{}] Retrieved {} records from DB", feedName, category, records.size());
+
+        // --- Write file ---
+        String fileName = fileNamingService.buildDataFileName(feedDefinition, category);
+        FileMetadata metadata;
+        try {
+            metadata = fileWriterService.writeDataFile(fileName, category, feedDefinition, records);
+        } catch (Exception e) {
+            throw new IllegalStateException(
+                String.format("[%s][%s] File write failed for '%s': %s",
+                        feedName, category, fileName, e.getMessage()), e);
+        }
+
+        log.info("[{}][{}] File written: {} ({} records)", feedName, category, fileName, records.size());
+
+        // --- Accumulate deliveredFiles for control + SFTP steps ---
+        List<FileMetadata> deliveredFiles =
+                (List<FileMetadata>) jobCtx.get("deliveredFiles");
+        if (deliveredFiles == null) {
+            deliveredFiles = new ArrayList<>();
+            jobCtx.put("deliveredFiles", deliveredFiles);
+        }
+        deliveredFiles.add(metadata);
 
         return RepeatStatus.FINISHED;
     }

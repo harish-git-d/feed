@@ -1,90 +1,85 @@
-# GAI Batch Project
+# GAI Batch Feed Project
 
-A brand new Spring Batch scaffold for generating GAI 2.0 style files from feed definitions.
+Spring Batch 5 application that generates GAI 2.0 ADIL feed files from the SCEF Oracle database.
 
-## What this project does
+## Architecture
 
-This starter project is designed around the flow you showed:
+One job (`gaiFeedJob`) runs per feed, per day:
 
-1. Load a feed definition.
-2. Build three output files per feed:
-   - EVENT
-   - RECORD
-   - ATTRIBUTE
-3. Build a CONTROL file after the three data files are written.
-4. Optionally transfer the files through SFTP.
-
-## Project structure
-
-- `config` - batch/job wiring and configuration properties
-- `domain` - feed metadata and output model
-- `service` - naming, file writing, transfer, and sample data generation
-- `tasklet` - Spring Batch steps
-- `src/main/resources/feed-definitions` - sample feed definitions in YAML
-
-## Run locally
-
-```bash
-mvn spring-boot:run \
-  -Dspring-boot.run.arguments="--gai.feed-name=stress-exposure --gai.cob-date=2025-12-31 --gai.file-timestamp=20260122144002"
+```
+loadDefinitionStep    → loads feed YAML from classpath
+generateEventStep     → queries DB, writes EVENT .dat.gz
+generateRecordStep    → queries DB, writes RECORD .dat.gz
+generateAttributeStep → queries DB, writes ATTRIBUTE .dat.gz
+generateControlStep   → writes CONTROL .dat.gz  (GAI processing trigger)
+transferFilesStep     → SFTP: data files first, control file last
 ```
 
-## Output files
+## File naming
 
-By default the project writes to:
-
-```text
-./build/output
+```
+161534_CRC_SCEF-{MODULE}_N_{CATEGORY}_{FREQ}_F_SRC_{COBDATE}_{TIMESTAMP}.dat.gz
 ```
 
-Example output naming:
-
-```text
+Example:
+```
 161534_CRC_SCEF-STRESSEXP_N_EVENT_DLY_F_SRC_20251231_20260122144002.dat.gz
 161534_CRC_SCEF-STRESSEXP_N_RECORD_DLY_F_SRC_20251231_20260122144002.dat.gz
 161534_CRC_SCEF-STRESSEXP_N_ATTRIBUTE_DLY_F_SRC_20251231_20260122144002.dat.gz
 161534_CRC_SCEF-STRESSEXP_N_CONTROL_DLY_F_SRC_20251231_20260122144002.dat.gz
 ```
 
-## Where to extend
+## Feeds
 
-- Replace `SampleDataFactory` with JDBC-based extraction from your Oracle/SCEF source.
-- Replace sample feed YAML with one definition per real feed.
-- Move SFTP credentials to a secret manager.
-- Add separate EVENT / RECORD / ATTRIBUTE projection logic if each feed needs different fields.
+| Feed name       | Module  | Frequency |
+|----------------|---------|-----------|
+| stress-exposure | STRESSEXP | Daily   |
+| swwr-flag       | SWWR      | Daily   |
+| pse-exposure    | PSE       | Daily   |
+| swwr-recovery   | SWWRRCY   | Daily   |
+| oet-flag        | OET       | Daily   |
+| pse-month-end   | PSEME     | Monthly |
 
-## Sample feeds already wired
+## Running
 
-- `stress-exposure`
-- `swwr`
-- `pse-exposure`
-- `swwr-recovery`
-- `oet-flag`
-- `pse-month-end`
+```bash
+# DEV - single feed
+java -jar gai-batch-project.jar \
+  --spring.profiles.active=dev \
+  --gai.feed-name=stress-exposure \
+  --gai.cob-date=20251231 \
+  --gai.file-timestamp=20260122144002
 
-## Overview
-This Spring Batch application generates GAI (Global Aggregation Interface) feed files from database queries without requiring any database table creation permissions.
+# Or via env vars
+GAI_FEED_NAME=stress-exposure GAI_COB_DATE=20251231 GAI_FILE_TIMESTAMP=20260122144002 \
+  java -jar gai-batch-project.jar --spring.profiles.active=dev
+```
 
-## Architecture Highlights
+To run all 5 daily feeds wrap in a shell loop or scheduler that calls the jar once per feed name.
 
-### No Database Table Creation
-- **Read-only database access** - Application only queries existing tables
-- **No Spring Batch metadata tables** - Uses in-memory job repository
-- **No JPA entity tables** - All data models are DTOs for file generation
-- **No persistence layer** - Application is stateless
+## SQL files
 
-### Database Requirements
-- Single database connection with **SELECT** permission only
-- Access to tables/views referenced in SQL queries under `src/main/resources/sql/`
-- No need for DBA involvement or table creation
+Each feed × category needs a SQL file at:
+```
+src/main/resources/sql/{feedName}_{category}_query.sql
+```
 
-### Job Execution Tracking
-Since Spring Batch metadata tables are not used:
-- Job execution history is **not persisted** to database
-- Each run is independent with no state carried between executions
-- Job status is logged to application logs only
-- Use external monitoring/orchestration tools for job tracking
+The SQL must accept a single positional `?` parameter for the COB date (YYYYMMDD string).
 
-## Configuration
+Files already present (stub queries, replace with real SCEF table names):
+- `stress-exposure_{event,record,attribute}_query.sql`
+- `swwr-flag_{event,record,attribute}_query.sql`
+- `pse-exposure_{event,record,attribute}_query.sql`
+- `swwr-recovery_{event,record,attribute}_query.sql`
+- `oet-flag_{event,record,attribute}_query.sql`
+- `pse-month-end_{event,record,attribute}_query.sql`
 
-### Minimum Required Environment Variables
+## SFTP
+
+Set `gai.sftp.enabled=true` and configure host/credentials per environment profile.
+The control file is always sent last — GAI uses it as the processing trigger.
+
+## Pending from GAI team
+
+- `gai.sftp.remote-directory` — SFTP target path not yet confirmed
+- `pse-month-end` frequency calendar — confirm last BD vs last calendar day rule

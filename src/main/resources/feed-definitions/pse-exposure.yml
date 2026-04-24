@@ -5,33 +5,28 @@ sourceSystemName: "SCEF"
 recordType: facility
 attributeName: "PSE"
 adjustmentType: "Risk User Adjustment - PSE Exposure - Facility"
-attributeDescription: "PSE Exposure adjustment for facilities"
+attributeDescription: "PSE Exposure adjustment at facility level"
 delimiter: "|"
-headerTemplate: "H|attribute_names"
 trailerTemplate: "T|{cobDate}|{recordCount}"
 recordFields:
-  - H
-  - ADJ_INVENTORY_ID
-  - ADJUSTMENT_UPLOAD_ID
-  - ADJUSTMENT_TYPE
+  - ATTRIBUTE_ADJUSTMENT_ID
+  - RECORD_ID
+  - ATTRIBUTE_NAME
+  - OLD_VALUE
+  - NEW_VALUE
   - EFFECTIVE_DATE
   - POSTED_DATE
   - CHECKER_SOEID
   - MAKER_SOEID
-  - ATTRIBUTE_NAME
-  - OLD_VALUE
-  - NEW_VALUE
-  - ORIGINAL_CSI
-  - ADJUSTMENT_POSTING_STATUS
-  - TRANSACTION_CCY
   - ADJUSTMENT_METHOD
+  - ADJUSTMENT_TYPE
   - REASON_CODE
-  - SUB_REASON_CODE
-  - EVENT_STATUS
-  - RECURRENCE
   - ADJUSTING_SYSTEM
   - FREQUENCY
   - REQUESTOR_SOEID
-  - STANDARD_ACCOUNT
-  - FRS_BU
-  - BALANCE_TYPE
+  - COB_DATE
+  - TRANSACTION_CCY
+  - ORIGINAL_CSI
+  - LVID
+  - ADJUSTMENT_POSTING_STATUS
+  - UITID

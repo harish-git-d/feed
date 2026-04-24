@@ -1,40 +1,23 @@
 package com.ccc.risk.credit.gai.config;
 
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.support.JobRepositoryFactoryBean;
-import org.springframework.batch.support.transaction.ResourcelessTransactionManager;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
-import org.springframework.jdbc.support.JdbcTransactionManager;
-import org.springframework.transaction.PlatformTransactionManager;
 
-import javax.sql.DataSource;
-
+/**
+ * Spring Batch configuration.
+ *
+ * <p>Spring Boot 3 + Spring Batch 5 auto-configures the JobRepository,
+ * JobLauncher, and TransactionManager from the primary DataSource.
+ * No manual wiring is needed — @EnableBatchProcessing is intentionally
+ * omitted because it disables Boot's auto-configuration in SBatch 5.
+ *
+ * <p>Batch metadata tables are initialized from the H2 schema on test
+ * profile and must exist in Oracle for DEV/SIT/UAT/PROD
+ * (run spring-batch-core schema-oracle.sql once per environment).
+ */
 @Configuration
-@EnableBatchProcessing
 public class BatchConfig {
-
-    /**
-     * Job repository configured WITHOUT database tables
-     * Uses MapJobRepositoryFactoryBean internally when tables don't exist
-     */
-    @Bean
-    public JobRepository jobRepository(DataSource dataSource,
-                                       PlatformTransactionManager transactionManager) throws Exception {
-        JobRepositoryFactoryBean factory = new JobRepositoryFactoryBean();
-        factory.setDataSource(dataSource);
-        factory.setTransactionManager(transactionManager);
-        factory.setIsolationLevelForCreate("ISOLATION_DEFAULT");
-        factory.setValidateTransactionState(false);
-        // Don't validate table existence
-        factory.afterPropertiesSet();
-        return factory.getObject();
-    }
-
-    @Bean
-    public PlatformTransactionManager batchTransactionManager(DataSource dataSource) {
-        return new DataSourceTransactionManager(dataSource);
-    }
+    // Auto-configured by Spring Boot:
+    //   - JobRepository    (backed by primary DataSource)
+    //   - JobLauncher      (async or sync via spring.batch.job.*)
+    //   - TransactionManager (HikariCP -> DataSourceTransactionManager)
 }

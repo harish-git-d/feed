@@ -1,5 +1,7 @@
 package com.ccc.risk.credit.gai.config;
 
+import com.ccc.risk.credit.gai.listener.FeedJobExecutionListener;
+import com.ccc.risk.credit.gai.listener.SftpRetryStepListener;
 import com.ccc.risk.credit.gai.service.DatabaseQueryService;
 import com.ccc.risk.credit.gai.service.FeedFileNamingService;
 import com.ccc.risk.credit.gai.service.FileWriterService;
@@ -9,17 +11,38 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
 import org.springframework.transaction.PlatformTransactionManager;
 
+/**
+ * Wires the {@code gaiFeedJob} Spring Batch job.
+ *
+ * <p>Step sequence:
+ * <ol>
+ *   <li>loadDefinitionStep    — loads feed YAML from classpath</li>
+ *   <li>generateEventStep     — queries DB, writes EVENT .dat.gz</li>
+ *   <li>generateRecordStep    — queries DB, writes RECORD .dat.gz</li>
+ *   <li>generateAttributeStep — queries DB, writes ATTRIBUTE .dat.gz</li>
+ *   <li>generateControlStep   — writes CONTROL .dat.gz (GAI trigger)</li>
+ *   <li>transferFilesStep     — SFTP: data files first, control file last</li>
+ * </ol>
+ *
+ * <p>Exception handling:
+ * <ul>
+ *   <li>{@link FeedJobExecutionListener} — cleans up partial files and sends
+ *       email alert on job failure</li>
+ *   <li>{@link SftpRetryStepListener} — logs retry hint on SFTP step failure</li>
+ *   <li>{@link com.ccc.risk.credit.gai.service.SftpTransferService} — retries
+ *       transfer up to 3 times with exponential backoff</li>
+ * </ul>
+ */
 @Configuration
 public class JobConfig {
 
     @Bean
     public Job gaiFeedJob(JobRepository jobRepository,
+                          FeedJobExecutionListener jobListener,
                           Step loadDefinitionStep,
                           Step generateEventStep,
                           Step generateRecordStep,
@@ -27,6 +50,7 @@ public class JobConfig {
                           Step generateControlStep,
                           Step transferFilesStep) {
         return new JobBuilder("gaiFeedJob", jobRepository)
+                .listener(jobListener)          // cleanup + email on failure
                 .start(loadDefinitionStep)
                 .next(generateEventStep)
                 .next(generateRecordStep)
@@ -48,27 +72,42 @@ public class JobConfig {
     @Bean
     public Step generateEventStep(JobRepository jobRepository,
                                   PlatformTransactionManager transactionManager,
-                                  GenerateCategoryFileTasklet eventTasklet) {
+                                  DatabaseQueryService dbService,
+                                  FeedFileNamingService namingService,
+                                  FileWriterService writerService,
+                                  FeedProperties feedProperties) {
         return new StepBuilder("generateEventStep", jobRepository)
-                .tasklet(eventTasklet, transactionManager)
+                .tasklet(new GenerateCategoryFileTasklet(
+                        namingService, writerService, dbService, feedProperties, "EVENT"),
+                         transactionManager)
                 .build();
     }
 
     @Bean
     public Step generateRecordStep(JobRepository jobRepository,
                                    PlatformTransactionManager transactionManager,
-                                   GenerateCategoryFileTasklet recordTasklet) {
+                                   DatabaseQueryService dbService,
+                                   FeedFileNamingService namingService,
+                                   FileWriterService writerService,
+                                   FeedProperties feedProperties) {
         return new StepBuilder("generateRecordStep", jobRepository)
-                .tasklet(recordTasklet, transactionManager)
+                .tasklet(new GenerateCategoryFileTasklet(
+                        namingService, writerService, dbService, feedProperties, "RECORD"),
+                         transactionManager)
                 .build();
     }
 
     @Bean
     public Step generateAttributeStep(JobRepository jobRepository,
                                       PlatformTransactionManager transactionManager,
-                                      GenerateCategoryFileTasklet attributeTasklet) {
+                                      DatabaseQueryService dbService,
+                                      FeedFileNamingService namingService,
+                                      FileWriterService writerService,
+                                      FeedProperties feedProperties) {
         return new StepBuilder("generateAttributeStep", jobRepository)
-                .tasklet(attributeTasklet, transactionManager)
+                .tasklet(new GenerateCategoryFileTasklet(
+                        namingService, writerService, dbService, feedProperties, "ATTRIBUTE"),
+                         transactionManager)
                 .build();
     }
 
@@ -84,39 +123,11 @@ public class JobConfig {
     @Bean
     public Step transferFilesStep(JobRepository jobRepository,
                                   PlatformTransactionManager transactionManager,
-                                  TransferFilesTasklet tasklet) {
+                                  TransferFilesTasklet tasklet,
+                                  SftpRetryStepListener sftpListener) {
         return new StepBuilder("transferFilesStep", jobRepository)
                 .tasklet(tasklet, transactionManager)
+                .listener(sftpListener)         // logs retry hint on SFTP failure
                 .build();
-    }
-
-    @Bean
-    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public GenerateCategoryFileTasklet eventTasklet(DatabaseQueryService databaseQueryService,
-                                                    FeedFileNamingService fileNamingService,
-                                                    FileWriterService fileWriterService,
-                                                    FeedProperties feedProperties) {
-        return new GenerateCategoryFileTasklet(fileNamingService, fileWriterService,
-                databaseQueryService, feedProperties, "EVENT");
-    }
-
-    @Bean
-    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public GenerateCategoryFileTasklet recordTasklet(DatabaseQueryService databaseQueryService,
-                                                     FeedFileNamingService fileNamingService,
-                                                     FileWriterService fileWriterService,
-                                                     FeedProperties feedProperties) {
-        return new GenerateCategoryFileTasklet(fileNamingService, fileWriterService,
-                databaseQueryService, feedProperties, "RECORD");
-    }
-
-    @Bean
-    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public GenerateCategoryFileTasklet attributeTasklet(DatabaseQueryService databaseQueryService,
-                                                        FeedFileNamingService fileNamingService,
-                                                        FileWriterService fileWriterService,
-                                                        FeedProperties feedProperties) {
-        return new GenerateCategoryFileTasklet(fileNamingService, fileWriterService,
-                databaseQueryService, feedProperties, "ATTRIBUTE");
     }
 }

@@ -3,23 +3,28 @@ moduleName: PSEME
 sourceSystemCsi: "161534"
 sourceSystemName: "SCEF"
 recordType: facility
-attributeName: "PSE"
+attributeName: "PSE_ME"
 adjustmentType: "Risk User Adjustment - Month End PSE Exposure - Facility"
-attributeDescription: "PSE Monthly Adjustment allows replacing system calculated PSE to adjusted PSE."
+attributeDescription: "Month End PSE Exposure - OS_OVER_ZERO_DYS"
 delimiter: "|"
-headerTemplate: "H|attribute_names"
 trailerTemplate: "T|{cobDate}|{recordCount}"
 recordFields:
-  - H
-  - ADJ_INVENTORY_ID
-  - ADJUSTMENT_UPLOAD_ID
-  - ADJUSTMENT_TYPE
+  - ATTRIBUTE_ADJUSTMENT_ID
+  - RECORD_ID
+  - ATTRIBUTE_NAME
+  - OLD_VALUE
+  - NEW_VALUE
   - EFFECTIVE_DATE
   - POSTED_DATE
-  - ATTRIBUTE_NAME
-  - ATTRIBUTE_DESCRIPTION
-  - DETAIL_ATTRIBUTE1
-  - DETAIL_ATTRIBUTE2
-  - DETAIL_ATTRIBUTE3
-  - DETAIL_ATTRIBUTE4
-  - JOURNAL_UPLOAD_DESCRIPTION
+  - CHECKER_SOEID
+  - MAKER_SOEID
+  - ADJUSTMENT_METHOD
+  - ADJUSTMENT_TYPE
+  - REASON_CODE
+  - ADJUSTING_SYSTEM
+  - FREQUENCY
+  - REQUESTOR_SOEID
+  - COB_DATE
+  - ADJUSTMENT_POSTING_STATUS
+  - LVID
+  - UITID
