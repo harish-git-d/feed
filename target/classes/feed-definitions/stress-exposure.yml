@@ -1,0 +1,32 @@
+feedName: stress-exposure
+moduleName: STRESSEXP
+sourceSystemCsi: "161534"
+sourceSystemName: "SCEF"
+recordType: trade
+attributeName: "Stress Exposure"
+adjustmentType: "Risk User Adjustment - Stress Exposure - Trade"
+attributeDescription: "CEF/MTM override on a trade used in PSE calculation"
+delimiter: "|"
+trailerTemplate: "T|{cobDate}|{recordCount}"
+recordFields:
+  - ATTRIBUTE_ADJUSTMENT_ID
+  - RECORD_ID
+  - ATTRIBUTE_NAME
+  - OLD_VALUE
+  - NEW_VALUE
+  - EFFECTIVE_DATE
+  - POSTED_DATE
+  - CHECKER_SOEID
+  - MAKER_SOEID
+  - ADJUSTMENT_METHOD
+  - ADJUSTMENT_TYPE
+  - REASON_CODE
+  - ADJUSTING_SYSTEM
+  - FREQUENCY
+  - REQUESTOR_SOEID
+  - COB_DATE
+  - TRANSACTION_CCY
+  - ORIGINAL_CSI
+  - LVID
+  - ADJUSTMENT_POSTING_STATUS
+  - UITID

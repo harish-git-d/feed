@@ -1,0 +1,231 @@
+2026-04-24T11:17:33.081-04:00  INFO 51116 --- [gai-batch-feed] [main] c.c.r.credit.gai.FeedBatchApplication    : Starting FeedBatchApplication using Java 21.0.5 with PID 51116 (C:\Users\hminnag\IdeaProjects\gai-batch-project-fixed\target\classes started by hminnag in C:\Users\hminnag\IdeaProjects\gai-batch-project-fixed)
+2026-04-24T11:17:33.084-04:00 DEBUG 51116 --- [gai-batch-feed] [main] c.c.r.credit.gai.FeedBatchApplication    : Running with Spring Boot v3.3.5, Spring v6.1.14
+2026-04-24T11:17:33.085-04:00  INFO 51116 --- [gai-batch-feed] [main] c.c.r.credit.gai.FeedBatchApplication    : No active profile set, falling back to 1 default profile: "default"
+2026-04-24T11:17:36.231-04:00  WARN 51116 --- [gai-batch-feed] [main] trationDelegate$BeanPostProcessorChecker : Bean 'dataSourceConfig' of type [com.ccc.risk.credit.gai.config.DataSourceConfig$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected/applied to a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies/advisors. If this bean does not have to be post-processed, declare it with ROLE_INFRASTRUCTURE.
+2026-04-24T11:17:36.261-04:00  INFO 51116 --- [gai-batch-feed] [main] c.c.r.c.gai.config.DataSourceConfig      : Initialising SCEF Oracle datasource: jdbc:oracle:thin:@localhost:1521/ORCL
+2026-04-24T11:17:37.011-04:00  INFO 51116 --- [gai-batch-feed] [main] com.zaxxer.hikari.HikariDataSource       : ScefOraclePool - Starting...
+2026-04-24T11:17:38.219-04:00  WARN 51116 --- [gai-batch-feed] [main] s.c.a.AnnotationConfigApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'org.springframework.boot.autoconfigure.batch.BatchAutoConfiguration$SpringBootBatchConfiguration': Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'scefDataSource' defined in class path resource [com/ccc/risk/credit/gai/config/DataSourceConfig.class]: Failed to instantiate [javax.sql.DataSource]: Factory method 'scefDataSource' threw exception with message: Failed to initialize pool: IO Error: The Network Adapter could not establish the connection (CONNECTION_ID=caI4LgdPTJyVfRYP0ZgxbA==)
+2026-04-24T11:17:38.235-04:00  INFO 51116 --- [gai-batch-feed] [main] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-04-24T11:17:38.293-04:00 ERROR 51116 --- [gai-batch-feed] [main] o.s.boot.SpringApplication               : Application run failed
+
+org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'org.springframework.boot.autoconfigure.batch.BatchAutoConfiguration$SpringBootBatchConfiguration': Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'scefDataSource' defined in class path resource [com/ccc/risk/credit/gai/config/DataSourceConfig.class]: Failed to instantiate [javax.sql.DataSource]: Factory method 'scefDataSource' threw exception with message: Failed to initialize pool: IO Error: The Network Adapter could not establish the connection (CONNECTION_ID=caI4LgdPTJyVfRYP0ZgxbA==)
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:795) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:237) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1375) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1212) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:562) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:337) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:335) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:200) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:409) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1355) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1185) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:562) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:337) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:335) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:205) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.registerBeanPostProcessors(PostProcessorRegistrationDelegate.java:277) ~[spring-context-6.1.14.jar:6.1.14]
+	at org.springframework.context.support.AbstractApplicationContext.registerBeanPostProcessors(AbstractApplicationContext.java:806) ~[spring-context-6.1.14.jar:6.1.14]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:609) ~[spring-context-6.1.14.jar:6.1.14]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754) ~[spring-boot-3.3.5.jar:3.3.5]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:456) ~[spring-boot-3.3.5.jar:3.3.5]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:335) ~[spring-boot-3.3.5.jar:3.3.5]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363) ~[spring-boot-3.3.5.jar:3.3.5]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352) ~[spring-boot-3.3.5.jar:3.3.5]
+	at com.ccc.risk.credit.gai.FeedBatchApplication.main(FeedBatchApplication.java:43) ~[classes/:na]
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'scefDataSource' defined in class path resource [com/ccc/risk/credit/gai/config/DataSourceConfig.class]: Failed to instantiate [javax.sql.DataSource]: Factory method 'scefDataSource' threw exception with message: Failed to initialize pool: IO Error: The Network Adapter could not establish the connection (CONNECTION_ID=caI4LgdPTJyVfRYP0ZgxbA==)
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:648) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:636) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1355) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1185) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:562) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:337) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:335) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:200) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:254) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1443) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1353) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:904) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:782) ~[spring-beans-6.1.14.jar:6.1.14]
+	... 27 common frames omitted
+Caused by: org.springframework.beans.BeanInstantiationException: Failed to instantiate [javax.sql.DataSource]: Factory method 'scefDataSource' threw exception with message: Failed to initialize pool: IO Error: The Network Adapter could not establish the connection (CONNECTION_ID=caI4LgdPTJyVfRYP0ZgxbA==)
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:178) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:644) ~[spring-beans-6.1.14.jar:6.1.14]
+	... 41 common frames omitted
+Caused by: com.zaxxer.hikari.pool.HikariPool$PoolInitializationException: Failed to initialize pool: IO Error: The Network Adapter could not establish the connection (CONNECTION_ID=caI4LgdPTJyVfRYP0ZgxbA==)
+	at com.zaxxer.hikari.pool.HikariPool.throwPoolInitializationException(HikariPool.java:584) ~[HikariCP-5.1.0.jar:na]
+	at com.zaxxer.hikari.pool.HikariPool.checkFailFast(HikariPool.java:571) ~[HikariCP-5.1.0.jar:na]
+	at com.zaxxer.hikari.pool.HikariPool.<init>(HikariPool.java:98) ~[HikariCP-5.1.0.jar:na]
+	at com.zaxxer.hikari.HikariDataSource.<init>(HikariDataSource.java:80) ~[HikariCP-5.1.0.jar:na]
+	at com.ccc.risk.credit.gai.config.DataSourceConfig.scefDataSource(DataSourceConfig.java:87) ~[classes/:na]
+	at com.ccc.risk.credit.gai.config.DataSourceConfig$$SpringCGLIB$$0.CGLIB$scefDataSource$1(<generated>) ~[classes/:na]
+	at com.ccc.risk.credit.gai.config.DataSourceConfig$$SpringCGLIB$$FastClass$$1.invoke(<generated>) ~[classes/:na]
+	at org.springframework.cglib.proxy.MethodProxy.invokeSuper(MethodProxy.java:258) ~[spring-core-6.1.14.jar:6.1.14]
+	at org.springframework.context.annotation.ConfigurationClassEnhancer$BeanMethodInterceptor.intercept(ConfigurationClassEnhancer.java:348) ~[spring-context-6.1.14.jar:6.1.14]
+	at com.ccc.risk.credit.gai.config.DataSourceConfig$$SpringCGLIB$$0.scefDataSource(<generated>) ~[classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:146) ~[spring-beans-6.1.14.jar:6.1.14]
+	... 42 common frames omitted
+Caused by: java.sql.SQLRecoverableException: IO Error: The Network Adapter could not establish the connection (CONNECTION_ID=caI4LgdPTJyVfRYP0ZgxbA==)
+	at oracle.jdbc.driver.T4CConnection.handleLogonNetException(T4CConnection.java:902) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at oracle.jdbc.driver.T4CConnection.logon(T4CConnection.java:707) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at oracle.jdbc.driver.PhysicalConnection.connect(PhysicalConnection.java:1094) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at oracle.jdbc.driver.T4CDriverExtension.getConnection(T4CDriverExtension.java:89) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at oracle.jdbc.driver.OracleDriver.connect(OracleDriver.java:732) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at oracle.jdbc.driver.OracleDriver.connect(OracleDriver.java:648) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at com.zaxxer.hikari.util.DriverDataSource.getConnection(DriverDataSource.java:137) ~[HikariCP-5.1.0.jar:na]
+	at com.zaxxer.hikari.pool.PoolBase.newConnection(PoolBase.java:360) ~[HikariCP-5.1.0.jar:na]
+	at com.zaxxer.hikari.pool.PoolBase.newPoolEntry(PoolBase.java:202) ~[HikariCP-5.1.0.jar:na]
+	at com.zaxxer.hikari.pool.HikariPool.createPoolEntry(HikariPool.java:461) ~[HikariCP-5.1.0.jar:na]
+	at com.zaxxer.hikari.pool.HikariPool.checkFailFast(HikariPool.java:550) ~[HikariCP-5.1.0.jar:na]
+	... 53 common frames omitted
+Caused by: oracle.net.ns.NetException: The Network Adapter could not establish the connection (CONNECTION_ID=caI4LgdPTJyVfRYP0ZgxbA==)
+	at oracle.net.nt.ConnStrategy.execute(ConnStrategy.java:715) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at oracle.net.resolver.AddrResolution.resolveAndExecute(AddrResolution.java:584) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at oracle.net.ns.NSProtocol.establishConnection(NSProtocol.java:964) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at oracle.net.ns.NSProtocol.connect(NSProtocol.java:350) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at oracle.jdbc.driver.T4CConnection.connect(T4CConnection.java:2627) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at oracle.jdbc.driver.T4CConnection.logon(T4CConnection.java:666) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	... 62 common frames omitted
+Caused by: java.io.IOException: Connection refused: connect, socket connect lapse 1 ms. localhost 1521  30000 (2/2) true
+	at oracle.net.nt.TcpNTAdapter.establishSocket(TcpNTAdapter.java:425) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at oracle.net.nt.TcpNTAdapter.doLocalDNSLookupConnect(TcpNTAdapter.java:307) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at oracle.net.nt.TcpNTAdapter.connect(TcpNTAdapter.java:269) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at oracle.net.nt.ConnOption.connect(ConnOption.java:230) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at oracle.net.nt.ConnStrategy.executeConnOption(ConnStrategy.java:1014) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at oracle.net.nt.ConnStrategy.execute(ConnStrategy.java:673) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	... 67 common frames omitted
+Caused by: java.net.ConnectException: Connection refused: connect
+	at java.base/sun.nio.ch.Net.connect0(Native Method) ~[na:na]
+	at java.base/sun.nio.ch.Net.connect(Net.java:589) ~[na:na]
+	at java.base/sun.nio.ch.Net.connect(Net.java:596) ~[na:na]
+	at java.base/sun.nio.ch.SocketChannelImpl.connect(SocketChannelImpl.java:880) ~[na:na]
+	at java.base/java.nio.channels.SocketChannel.open(SocketChannel.java:285) ~[na:na]
+	at oracle.net.nt.TimeoutSocketChannel.connect(TimeoutSocketChannel.java:183) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at oracle.net.nt.TimeoutSocketChannel.<init>(TimeoutSocketChannel.java:157) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at oracle.net.nt.TcpNTAdapter.establishSocket(TcpNTAdapter.java:384) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	... 72 common frames omitted
+
+2026-04-24T11:19:27.081-04:00  INFO 55760 --- [gai-batch-feed] [main] c.c.r.credit.gai.FeedBatchApplication    : Starting FeedBatchApplication using Java 21.0.5 with PID 55760 (C:\Users\hminnag\IdeaProjects\gai-batch-project-fixed\target\classes started by hminnag in C:\Users\hminnag\IdeaProjects\gai-batch-project-fixed)
+2026-04-24T11:19:27.085-04:00 DEBUG 55760 --- [gai-batch-feed] [main] c.c.r.credit.gai.FeedBatchApplication    : Running with Spring Boot v3.3.5, Spring v6.1.14
+2026-04-24T11:19:27.085-04:00  INFO 55760 --- [gai-batch-feed] [main] c.c.r.credit.gai.FeedBatchApplication    : No active profile set, falling back to 1 default profile: "default"
+2026-04-24T11:19:28.160-04:00  WARN 55760 --- [gai-batch-feed] [main] trationDelegate$BeanPostProcessorChecker : Bean 'dataSourceConfig' of type [com.ccc.risk.credit.gai.config.DataSourceConfig$$SpringCGLIB$$0] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected/applied to a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies/advisors. If this bean does not have to be post-processed, declare it with ROLE_INFRASTRUCTURE.
+2026-04-24T11:19:28.188-04:00  INFO 55760 --- [gai-batch-feed] [main] c.c.r.c.gai.config.DataSourceConfig      : Initialising SCEF Oracle datasource: jdbc:oracle:thin:@ORODS3D:1521/SCEF_DEV
+2026-04-24T11:19:28.267-04:00  INFO 55760 --- [gai-batch-feed] [main] com.zaxxer.hikari.HikariDataSource       : ScefOraclePool - Starting...
+2026-04-24T11:19:32.615-04:00  WARN 55760 --- [gai-batch-feed] [main] s.c.a.AnnotationConfigApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'org.springframework.boot.autoconfigure.batch.BatchAutoConfiguration$SpringBootBatchConfiguration': Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'scefDataSource' defined in class path resource [com/ccc/risk/credit/gai/config/DataSourceConfig.class]: Failed to instantiate [javax.sql.DataSource]: Factory method 'scefDataSource' threw exception with message: Failed to initialize pool: IO Error: The Network Adapter could not establish the connection (CONNECTION_ID=riQuWtweQGGu2hBzQUAk8g==)
+2026-04-24T11:19:32.622-04:00  INFO 55760 --- [gai-batch-feed] [main] .s.b.a.l.ConditionEvaluationReportLogger : 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+2026-04-24T11:19:32.663-04:00 ERROR 55760 --- [gai-batch-feed] [main] o.s.boot.SpringApplication               : Application run failed
+
+org.springframework.beans.factory.UnsatisfiedDependencyException: Error creating bean with name 'org.springframework.boot.autoconfigure.batch.BatchAutoConfiguration$SpringBootBatchConfiguration': Unsatisfied dependency expressed through constructor parameter 0: Error creating bean with name 'scefDataSource' defined in class path resource [com/ccc/risk/credit/gai/config/DataSourceConfig.class]: Failed to instantiate [javax.sql.DataSource]: Factory method 'scefDataSource' threw exception with message: Failed to initialize pool: IO Error: The Network Adapter could not establish the connection (CONNECTION_ID=riQuWtweQGGu2hBzQUAk8g==)
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:795) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.ConstructorResolver.autowireConstructor(ConstructorResolver.java:237) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.autowireConstructor(AbstractAutowireCapableBeanFactory.java:1375) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1212) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:562) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:337) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:335) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:200) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:409) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1355) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1185) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:562) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:337) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:335) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:205) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.context.support.PostProcessorRegistrationDelegate.registerBeanPostProcessors(PostProcessorRegistrationDelegate.java:277) ~[spring-context-6.1.14.jar:6.1.14]
+	at org.springframework.context.support.AbstractApplicationContext.registerBeanPostProcessors(AbstractApplicationContext.java:806) ~[spring-context-6.1.14.jar:6.1.14]
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:609) ~[spring-context-6.1.14.jar:6.1.14]
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:754) ~[spring-boot-3.3.5.jar:3.3.5]
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:456) ~[spring-boot-3.3.5.jar:3.3.5]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:335) ~[spring-boot-3.3.5.jar:3.3.5]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363) ~[spring-boot-3.3.5.jar:3.3.5]
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352) ~[spring-boot-3.3.5.jar:3.3.5]
+	at com.ccc.risk.credit.gai.FeedBatchApplication.main(FeedBatchApplication.java:43) ~[classes/:na]
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'scefDataSource' defined in class path resource [com/ccc/risk/credit/gai/config/DataSourceConfig.class]: Failed to instantiate [javax.sql.DataSource]: Factory method 'scefDataSource' threw exception with message: Failed to initialize pool: IO Error: The Network Adapter could not establish the connection (CONNECTION_ID=riQuWtweQGGu2hBzQUAk8g==)
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:648) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:636) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1355) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1185) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:562) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:522) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:337) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:234) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:335) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:200) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.config.DependencyDescriptor.resolveCandidate(DependencyDescriptor.java:254) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.doResolveDependency(DefaultListableBeanFactory.java:1443) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.resolveDependency(DefaultListableBeanFactory.java:1353) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.ConstructorResolver.resolveAutowiredArgument(ConstructorResolver.java:904) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.ConstructorResolver.createArgumentArray(ConstructorResolver.java:782) ~[spring-beans-6.1.14.jar:6.1.14]
+	... 27 common frames omitted
+Caused by: org.springframework.beans.BeanInstantiationException: Failed to instantiate [javax.sql.DataSource]: Factory method 'scefDataSource' threw exception with message: Failed to initialize pool: IO Error: The Network Adapter could not establish the connection (CONNECTION_ID=riQuWtweQGGu2hBzQUAk8g==)
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:178) ~[spring-beans-6.1.14.jar:6.1.14]
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:644) ~[spring-beans-6.1.14.jar:6.1.14]
+	... 41 common frames omitted
+Caused by: com.zaxxer.hikari.pool.HikariPool$PoolInitializationException: Failed to initialize pool: IO Error: The Network Adapter could not establish the connection (CONNECTION_ID=riQuWtweQGGu2hBzQUAk8g==)
+	at com.zaxxer.hikari.pool.HikariPool.throwPoolInitializationException(HikariPool.java:584) ~[HikariCP-5.1.0.jar:na]
+	at com.zaxxer.hikari.pool.HikariPool.checkFailFast(HikariPool.java:571) ~[HikariCP-5.1.0.jar:na]
+	at com.zaxxer.hikari.pool.HikariPool.<init>(HikariPool.java:98) ~[HikariCP-5.1.0.jar:na]
+	at com.zaxxer.hikari.HikariDataSource.<init>(HikariDataSource.java:80) ~[HikariCP-5.1.0.jar:na]
+	at com.ccc.risk.credit.gai.config.DataSourceConfig.scefDataSource(DataSourceConfig.java:87) ~[classes/:na]
+	at com.ccc.risk.credit.gai.config.DataSourceConfig$$SpringCGLIB$$0.CGLIB$scefDataSource$2(<generated>) ~[classes/:na]
+	at com.ccc.risk.credit.gai.config.DataSourceConfig$$SpringCGLIB$$FastClass$$1.invoke(<generated>) ~[classes/:na]
+	at org.springframework.cglib.proxy.MethodProxy.invokeSuper(MethodProxy.java:258) ~[spring-core-6.1.14.jar:6.1.14]
+	at org.springframework.context.annotation.ConfigurationClassEnhancer$BeanMethodInterceptor.intercept(ConfigurationClassEnhancer.java:348) ~[spring-context-6.1.14.jar:6.1.14]
+	at com.ccc.risk.credit.gai.config.DataSourceConfig$$SpringCGLIB$$0.scefDataSource(<generated>) ~[classes/:na]
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:146) ~[spring-beans-6.1.14.jar:6.1.14]
+	... 42 common frames omitted
+Caused by: java.sql.SQLRecoverableException: IO Error: The Network Adapter could not establish the connection (CONNECTION_ID=riQuWtweQGGu2hBzQUAk8g==)
+	at oracle.jdbc.driver.T4CConnection.handleLogonNetException(T4CConnection.java:902) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at oracle.jdbc.driver.T4CConnection.logon(T4CConnection.java:707) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at oracle.jdbc.driver.PhysicalConnection.connect(PhysicalConnection.java:1094) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at oracle.jdbc.driver.T4CDriverExtension.getConnection(T4CDriverExtension.java:89) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at oracle.jdbc.driver.OracleDriver.connect(OracleDriver.java:732) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at oracle.jdbc.driver.OracleDriver.connect(OracleDriver.java:648) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at com.zaxxer.hikari.util.DriverDataSource.getConnection(DriverDataSource.java:137) ~[HikariCP-5.1.0.jar:na]
+	at com.zaxxer.hikari.pool.PoolBase.newConnection(PoolBase.java:360) ~[HikariCP-5.1.0.jar:na]
+	at com.zaxxer.hikari.pool.PoolBase.newPoolEntry(PoolBase.java:202) ~[HikariCP-5.1.0.jar:na]
+	at com.zaxxer.hikari.pool.HikariPool.createPoolEntry(HikariPool.java:461) ~[HikariCP-5.1.0.jar:na]
+	at com.zaxxer.hikari.pool.HikariPool.checkFailFast(HikariPool.java:550) ~[HikariCP-5.1.0.jar:na]
+	... 53 common frames omitted
+Caused by: oracle.net.ns.NetException: The Network Adapter could not establish the connection (CONNECTION_ID=riQuWtweQGGu2hBzQUAk8g==)
+	at oracle.net.nt.ConnStrategy.execute(ConnStrategy.java:715) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at oracle.net.resolver.AddrResolution.resolveAndExecute(AddrResolution.java:584) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at oracle.net.ns.NSProtocol.establishConnection(NSProtocol.java:964) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at oracle.net.ns.NSProtocol.connect(NSProtocol.java:350) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at oracle.jdbc.driver.T4CConnection.connect(T4CConnection.java:2627) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at oracle.jdbc.driver.T4CConnection.logon(T4CConnection.java:666) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	... 62 common frames omitted
+Caused by: java.net.UnknownHostException: No such host is known (ORODS3D)
+	at java.base/java.net.Inet6AddressImpl.lookupAllHostAddr(Native Method) ~[na:na]
+	at java.base/java.net.Inet6AddressImpl.lookupAllHostAddr(Inet6AddressImpl.java:52) ~[na:na]
+	at java.base/java.net.InetAddress$PlatformResolver.lookupByName(InetAddress.java:1211) ~[na:na]
+	at java.base/java.net.InetAddress.getAddressesFromNameService(InetAddress.java:1828) ~[na:na]
+	at java.base/java.net.InetAddress$NameServiceAddresses.get(InetAddress.java:1139) ~[na:na]
+	at java.base/java.net.InetAddress.getAllByName0(InetAddress.java:1818) ~[na:na]
+	at java.base/java.net.InetAddress.getAllByName(InetAddress.java:1688) ~[na:na]
+	at oracle.net.nt.TcpNTAdapter.resolveInetAddresses(TcpNTAdapter.java:581) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at oracle.net.nt.TcpNTAdapter.doLocalDNSLookupConnect(TcpNTAdapter.java:300) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at oracle.net.nt.TcpNTAdapter.connect(TcpNTAdapter.java:269) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at oracle.net.nt.ConnOption.connect(ConnOption.java:230) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at oracle.net.nt.ConnStrategy.executeConnOption(ConnStrategy.java:1014) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	at oracle.net.nt.ConnStrategy.execute(ConnStrategy.java:673) ~[ojdbc11-21.9.0.0.jar:21.9.0.0.0]
+	... 67 common frames omitted
+

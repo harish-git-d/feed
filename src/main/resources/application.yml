@@ -53,9 +53,9 @@ gai:
 
   notification:
     enabled:   false
-    from:      scef-gai-feed@citi.com
+    from:
     to:        ${GAI_NOTIFY_TO:}
-    smtp-host: ${MAIL_HOST:mailrelay.citi.com}
+    smtp-host: ${MAIL_HOST:mailrelay.com}
     smtp-port: ${MAIL_PORT:25}
 
 # ─── Logging ────────────────────────────────────────────────────────────────

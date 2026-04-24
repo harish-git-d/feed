@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:oracle:thin:@ORODS3D:1521/SCEF_SIT
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+gai:
+  output-directory: /opt/scef/gai/staging/sit
+  sftp:
+    enabled: true
+    host: clmwiemap1d
+    username: opiemdv
+    password: ${SFTP_PASSWORD}
+    remote-directory: ${GAI_SFTP_REMOTE_DIR}   # TODO: confirm with GAI team

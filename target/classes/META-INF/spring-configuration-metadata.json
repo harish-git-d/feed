@@ -1,0 +1,163 @@
+{
+  "groups": [
+    {
+      "name": "gai",
+      "type": "com.ccc.risk.credit.gai.config.FeedProperties",
+      "sourceType": "com.ccc.risk.credit.gai.config.FeedProperties"
+    },
+    {
+      "name": "gai.notification",
+      "type": "com.ccc.risk.credit.gai.config.FeedProperties$Notification",
+      "sourceType": "com.ccc.risk.credit.gai.config.FeedProperties",
+      "sourceMethod": "getNotification()"
+    },
+    {
+      "name": "gai.sftp",
+      "type": "com.ccc.risk.credit.gai.config.FeedProperties$Sftp",
+      "sourceType": "com.ccc.risk.credit.gai.config.FeedProperties",
+      "sourceMethod": "getSftp()"
+    }
+  ],
+  "properties": [
+    {
+      "name": "gai.app-short-name",
+      "type": "java.lang.String",
+      "sourceType": "com.ccc.risk.credit.gai.config.FeedProperties",
+      "defaultValue": "CRC_SCEF"
+    },
+    {
+      "name": "gai.cob-date",
+      "type": "java.lang.String",
+      "sourceType": "com.ccc.risk.credit.gai.config.FeedProperties"
+    },
+    {
+      "name": "gai.feed-name",
+      "type": "java.lang.String",
+      "sourceType": "com.ccc.risk.credit.gai.config.FeedProperties"
+    },
+    {
+      "name": "gai.file-timestamp",
+      "type": "java.lang.String",
+      "sourceType": "com.ccc.risk.credit.gai.config.FeedProperties"
+    },
+    {
+      "name": "gai.file-type-indicator",
+      "type": "java.lang.String",
+      "sourceType": "com.ccc.risk.credit.gai.config.FeedProperties",
+      "defaultValue": "F"
+    },
+    {
+      "name": "gai.frequency",
+      "type": "java.lang.String",
+      "sourceType": "com.ccc.risk.credit.gai.config.FeedProperties",
+      "defaultValue": "DLY"
+    },
+    {
+      "name": "gai.gzip-enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.ccc.risk.credit.gai.config.FeedProperties",
+      "defaultValue": true
+    },
+    {
+      "name": "gai.notification.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.ccc.risk.credit.gai.config.FeedProperties$Notification",
+      "defaultValue": false
+    },
+    {
+      "name": "gai.notification.from",
+      "type": "java.lang.String",
+      "sourceType": "com.ccc.risk.credit.gai.config.FeedProperties$Notification"
+    },
+    {
+      "name": "gai.notification.smtp-host",
+      "type": "java.lang.String",
+      "sourceType": "com.ccc.risk.credit.gai.config.FeedProperties$Notification",
+      "defaultValue": "localhost"
+    },
+    {
+      "name": "gai.notification.smtp-port",
+      "type": "java.lang.Integer",
+      "sourceType": "com.ccc.risk.credit.gai.config.FeedProperties$Notification",
+      "defaultValue": 25
+    },
+    {
+      "name": "gai.notification.to",
+      "type": "java.lang.String",
+      "sourceType": "com.ccc.risk.credit.gai.config.FeedProperties$Notification"
+    },
+    {
+      "name": "gai.output-directory",
+      "type": "java.lang.String",
+      "sourceType": "com.ccc.risk.credit.gai.config.FeedProperties",
+      "defaultValue": ".\/output"
+    },
+    {
+      "name": "gai.region-instance",
+      "type": "java.lang.String",
+      "sourceType": "com.ccc.risk.credit.gai.config.FeedProperties",
+      "defaultValue": "N"
+    },
+    {
+      "name": "gai.sftp.enabled",
+      "type": "java.lang.Boolean",
+      "sourceType": "com.ccc.risk.credit.gai.config.FeedProperties$Sftp",
+      "defaultValue": false
+    },
+    {
+      "name": "gai.sftp.host",
+      "type": "java.lang.String",
+      "sourceType": "com.ccc.risk.credit.gai.config.FeedProperties$Sftp"
+    },
+    {
+      "name": "gai.sftp.known-hosts-path",
+      "type": "java.lang.String",
+      "sourceType": "com.ccc.risk.credit.gai.config.FeedProperties$Sftp"
+    },
+    {
+      "name": "gai.sftp.password",
+      "type": "java.lang.String",
+      "sourceType": "com.ccc.risk.credit.gai.config.FeedProperties$Sftp"
+    },
+    {
+      "name": "gai.sftp.port",
+      "type": "java.lang.Integer",
+      "sourceType": "com.ccc.risk.credit.gai.config.FeedProperties$Sftp",
+      "defaultValue": 22
+    },
+    {
+      "name": "gai.sftp.private-key-path",
+      "type": "java.lang.String",
+      "sourceType": "com.ccc.risk.credit.gai.config.FeedProperties$Sftp"
+    },
+    {
+      "name": "gai.sftp.remote-directory",
+      "type": "java.lang.String",
+      "sourceType": "com.ccc.risk.credit.gai.config.FeedProperties$Sftp"
+    },
+    {
+      "name": "gai.sftp.username",
+      "type": "java.lang.String",
+      "sourceType": "com.ccc.risk.credit.gai.config.FeedProperties$Sftp"
+    },
+    {
+      "name": "gai.source-indicator",
+      "type": "java.lang.String",
+      "sourceType": "com.ccc.risk.credit.gai.config.FeedProperties",
+      "defaultValue": "SRC"
+    },
+    {
+      "name": "gai.source-system-csi",
+      "type": "java.lang.String",
+      "sourceType": "com.ccc.risk.credit.gai.config.FeedProperties",
+      "defaultValue": "161534"
+    },
+    {
+      "name": "gai.source-system-name",
+      "type": "java.lang.String",
+      "sourceType": "com.ccc.risk.credit.gai.config.FeedProperties",
+      "defaultValue": "SCEF"
+    }
+  ],
+  "hints": []
+}

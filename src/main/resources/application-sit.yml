@@ -9,6 +9,6 @@ gai:
   sftp:
     enabled: true
     host:
-    username: opiemdv
+    username:
     password: ${SFTP_PASSWORD}
     remote-directory: ${GAI_SFTP_REMOTE_DIR}   # TODO: confirm with GAI team

@@ -1,14 +1,14 @@
 package com.ccc.risk.credit.gai.config;
 
+import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.batch.BatchDataSource;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import org.springframework.jdbc.support.JdbcTransactionManager;
@@ -16,35 +16,29 @@ import org.springframework.jdbc.support.JdbcTransactionManager;
 import javax.sql.DataSource;
 
 /**
- * Configures two datasources so that Spring Batch metadata tables never
- * touch Oracle — avoiding the need for any DDL permissions on the SCEF schema.
+ * Manually configures two datasources.
  *
- * <h3>batchDataSource (H2 in-memory)</h3>
- * Used exclusively by Spring Batch for its metadata tables
- * (BATCH_JOB_INSTANCE, BATCH_JOB_EXECUTION, BATCH_STEP_EXECUTION, etc.).
- * The schema is auto-created from the script bundled inside
- * {@code spring-batch-core.jar} — no files to manage, no DBA involvement.
- * Data is ephemeral: it exists only for the duration of the JVM process.
- * The {@code @BatchDataSource} annotation tells Spring Boot's Batch
- * auto-configuration to use this datasource instead of the primary one.
+ * <p>Spring Boot's {@code DataSourceAutoConfiguration} is excluded in
+ * {@link com.ccc.risk.credit.gai.FeedBatchApplication} to prevent Boot
+ * from creating a third conflicting datasource bean from
+ * {@code spring.datasource.*} properties.
  *
- * <h3>scefDataSource (Oracle — primary)</h3>
- * Used for all SCEF application data queries. Your Oracle user only needs
- * {@code SELECT} on the relevant SCEF views/tables — no DDL permissions required.
+ * <ul>
+ *   <li><b>batchDataSource</b> — H2 in-memory, tagged {@code @BatchDataSource}.
+ *       Spring Batch metadata tables auto-created from {@code schema-h2.sql}
+ *       bundled in {@code spring-batch-core.jar}. No Oracle permissions needed.</li>
+ *   <li><b>scefDataSource</b> — Oracle HikariCP, {@code @Primary}.
+ *       Used for all SCEF data queries. Needs only SELECT on SCEF views/tables.</li>
+ * </ul>
  */
 @Slf4j
 @Configuration
 public class DataSourceConfig {
 
     // -------------------------------------------------------------------------
-    // Spring Batch metadata — H2 in-memory (no Oracle permissions needed)
+    // H2 — Spring Batch metadata (no Oracle permissions needed)
     // -------------------------------------------------------------------------
 
-    /**
-     * H2 in-memory datasource for Spring Batch metadata tables.
-     * Schema is initialised automatically from the script shipped with
-     * {@code spring-batch-core} — {@code schema-h2.sql}.
-     */
     @Bean
     @BatchDataSource
     public DataSource batchDataSource() {
@@ -63,35 +57,34 @@ public class DataSourceConfig {
     }
 
     // -------------------------------------------------------------------------
-    // SCEF Oracle datasource — primary for all application queries
+    // Oracle — SCEF application data (SELECT only)
     // -------------------------------------------------------------------------
 
-    /**
-     * Provides the {@link DataSourceProperties} bound from
-     * {@code spring.datasource.*} in application YAML.
-     * Kept separate so the {@code scefDataSource} bean can be typed as
-     * {@link HikariDataSource} for pool-level config access if needed.
-     */
     @Bean
     @Primary
-    @ConfigurationProperties("spring.datasource")
-    public DataSourceProperties scefDataSourceProperties() {
-        return new DataSourceProperties();
-    }
+    public DataSource scefDataSource(Environment env) {
+        String url      = env.getRequiredProperty("spring.datasource.url");
+        String username = env.getRequiredProperty("spring.datasource.username");
+        String password = env.getRequiredProperty("spring.datasource.password");
 
-    /**
-     * Oracle HikariCP datasource for SCEF data queries.
-     * Only needs SELECT privileges on SCEF views/tables — no DDL.
-     */
-    @Bean
-    @Primary
-    @ConfigurationProperties("spring.datasource.hikari")
-    public HikariDataSource scefDataSource(
-            @Qualifier("scefDataSourceProperties") DataSourceProperties properties) {
-        log.info("Initialising SCEF Oracle datasource: {}", properties.getUrl());
-        return properties.initializeDataSourceBuilder()
-                .type(HikariDataSource.class)
-                .build();
+        log.info("Initialising SCEF Oracle datasource: {}", url);
+
+        HikariConfig config = new HikariConfig();
+        config.setDriverClassName("oracle.jdbc.OracleDriver");
+        config.setJdbcUrl(url);
+        config.setUsername(username);
+        config.setPassword(password);
+        config.setPoolName("ScefOraclePool");
+        config.setMinimumIdle(
+                env.getProperty("spring.datasource.hikari.minimum-idle", Integer.class, 2));
+        config.setMaximumPoolSize(
+                env.getProperty("spring.datasource.hikari.maximum-pool-size", Integer.class, 10));
+        config.setConnectionTimeout(30_000);
+        config.setIdleTimeout(600_000);
+        config.setMaxLifetime(1_800_000);
+        config.setConnectionTestQuery("SELECT 1 FROM DUAL");
+
+        return new HikariDataSource(config);
     }
 
     @Bean

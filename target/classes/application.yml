@@ -1,0 +1,70 @@
+spring:
+  application:
+    name: gai-batch-feed
+
+  # SCEF Oracle datasource — application data queries only.
+  # Spring Batch metadata is stored in H2 (see DataSourceConfig).
+  datasource:
+    driver-class-name: oracle.jdbc.OracleDriver
+    url:      ${DB_URL:jdbc:oracle:thin:@localhost:1521/ORCL}
+    username: ${DB_USERNAME:gai_user}
+    password: ${DB_PASSWORD:changeit}
+    hikari:
+      pool-name: ScefOraclePool
+      minimum-idle: 2
+      maximum-pool-size: 10
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      connection-test-query: SELECT 1 FROM DUAL
+
+  batch:
+    jdbc:
+      # "never" = Spring Boot will not attempt to create Batch tables in Oracle.
+      # Batch metadata tables are created automatically in H2 by DataSourceConfig.
+      initialize-schema: never
+    job:
+      enabled: false   # Jobs launched programmatically via CommandLineRunner
+
+# ─── GAI Feed Properties ────────────────────────────────────────────────────
+gai:
+  source-system-csi:    ${GAI_SOURCE_SYSTEM_CSI:161534}
+  source-system-name:   ${GAI_SOURCE_SYSTEM_NAME:SCEF}
+  app-short-name:       ${GAI_APP_SHORT_NAME:CRC_SCEF}
+  region-instance:      ${GAI_REGION_INSTANCE:N}
+  source-indicator:     ${GAI_SOURCE_INDICATOR:SRC}
+  frequency:            ${GAI_FREQUENCY:DLY}
+  file-type-indicator:  ${GAI_FILE_TYPE_INDICATOR:F}
+  output-directory:     ${GAI_OUTPUT_DIR:./output}
+  feed-name:            ${GAI_FEED_NAME:}
+  cob-date:             ${GAI_COB_DATE:}
+  file-timestamp:       ${GAI_FILE_TIMESTAMP:}
+  gzip-enabled:         ${GAI_GZIP_ENABLED:true}
+
+  sftp:
+    enabled:          ${GAI_SFTP_ENABLED:false}
+    host:             ${GAI_SFTP_HOST:}
+    port:             ${GAI_SFTP_PORT:22}
+    username:         ${GAI_SFTP_USERNAME:}
+    password:         ${GAI_SFTP_PASSWORD:}
+    private-key-path: ${GAI_SFTP_KEY_PATH:}
+    known-hosts-path: ${GAI_SFTP_KNOWN_HOSTS:}
+    remote-directory: ${GAI_SFTP_REMOTE_DIR:}
+
+  notification:
+    enabled:   false
+    from:      scef-gai-feed@citi.com
+    to:        ${GAI_NOTIFY_TO:}
+    smtp-host: ${MAIL_HOST:mailrelay.citi.com}
+    smtp-port: ${MAIL_PORT:25}
+
+# ─── Logging ────────────────────────────────────────────────────────────────
+logging:
+  level:
+    root: INFO
+    com.ccc.risk.credit.gai: DEBUG
+    org.springframework.batch: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level [%logger{36}] - %msg%n"
+  file:
+    name: logs/gai-batch-feed.log
