@@ -7,7 +7,6 @@ import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.item.ExecutionContext;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -61,17 +60,17 @@ public class InMemoryJobRepository implements JobRepository {
                 .orElse(null);
     }
 
-
+    @Override
     public JobInstance getJobInstance(long instanceId) {
         return jobInstances.get(instanceId);
     }
 
-
+    @Override
     public JobInstance getJobInstance(JobExecution jobExecution) {
         return jobExecution.getJobInstance();
     }
 
-
+    @Override
     public List<JobInstance> getJobInstances(String jobName, int start, int count) {
         return jobInstances.values().stream()
                 .filter(i -> i.getJobName().equals(jobName))
@@ -85,7 +84,7 @@ public class InMemoryJobRepository implements JobRepository {
         return getJobInstances(jobName, start, count);
     }
 
-
+    @Override
     public long getJobInstanceCount(String jobName) {
         return jobInstances.values().stream()
                 .filter(i -> i.getJobName().equals(jobName))
@@ -109,7 +108,7 @@ public class InMemoryJobRepository implements JobRepository {
         return createJobExecution(instance, jobParameters, null);
     }
 
-
+    @Override
     public JobExecution createJobExecution(JobInstance jobInstance,
                                            JobParameters jobParameters,
                                            String jobConfigurationLocation) {
@@ -117,14 +116,14 @@ public class InMemoryJobRepository implements JobRepository {
         JobExecution execution = new JobExecution(jobInstance, id, jobParameters);
         execution.setExecutionContext(new ExecutionContext());
         execution.setStatus(BatchStatus.STARTING);
-        execution.setCreateTime(LocalDateTime.now());
+        execution.setCreateTime(new java.util.Date());
         jobExecutions.put(id, execution);
         return execution;
     }
 
     @Override
     public void update(JobExecution jobExecution) {
-        jobExecution.setLastUpdated(LocalDateTime.now());
+        jobExecution.setLastUpdated(new java.util.Date());
         jobExecutions.put(jobExecution.getId(), jobExecution);
     }
 
@@ -141,6 +140,7 @@ public class InMemoryJobRepository implements JobRepository {
                 .orElse(null);
     }
 
+    @Override
     public Set<JobExecution> findRunningJobExecutions(String jobName) {
         Set<JobExecution> running = new HashSet<>();
         for (JobExecution e : jobExecutions.values()) {
@@ -152,16 +152,19 @@ public class InMemoryJobRepository implements JobRepository {
         return running;
     }
 
+    @Override
     public JobExecution getJobExecution(long executionId) {
         return jobExecutions.get(executionId);
     }
 
+    @Override
     public List<JobExecution> getJobExecutions(JobInstance jobInstance) {
         return jobExecutions.values().stream()
                 .filter(e -> e.getJobInstance().getId().equals(jobInstance.getId()))
                 .toList();
     }
 
+    @Override
     public List<JobExecution> findJobExecutionsByJobInstanceId(long instanceId, int start, int count) {
         return jobExecutions.values().stream()
                 .filter(e -> e.getJobInstance().getId() == instanceId)
@@ -179,7 +182,7 @@ public class InMemoryJobRepository implements JobRepository {
         long id = stepIdSeq.getAndIncrement();
         stepExecution.setId(id);
         stepExecution.setVersion(0);
-        stepExecution.setLastUpdated(LocalDateTime.now());
+        stepExecution.setLastUpdated(new java.util.Date());
         stepExecutions.put(id, stepExecution);
     }
 
@@ -190,7 +193,7 @@ public class InMemoryJobRepository implements JobRepository {
 
     @Override
     public void update(StepExecution stepExecution) {
-        stepExecution.setLastUpdated(LocalDateTime.now());
+        stepExecution.setLastUpdated(new java.util.Date());
         stepExecutions.put(stepExecution.getId(), stepExecution);
     }
 
@@ -218,6 +221,7 @@ public class InMemoryJobRepository implements JobRepository {
                 .count();
     }
 
+    @Override
     public Collection<StepExecution> getStepExecutions(JobExecution jobExecution) {
         return stepExecutions.values().stream()
                 .filter(s -> s.getJobExecution().getId().equals(jobExecution.getId()))
@@ -238,6 +242,7 @@ public class InMemoryJobRepository implements JobRepository {
         jobExecutions.remove(jobExecution.getId());
     }
 
+    @Override
     public void deleteJobInstanceAndRelatedData(JobInstance jobInstance) {
         jobInstances.remove(jobInstance.getId());
         jobExecutions.values().removeIf(

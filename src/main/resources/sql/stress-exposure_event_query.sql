@@ -1,20 +1,18 @@
 -- SCEF GAI Feed: stress-exposure EVENT
--- One event row per unique request_id for the given COB date.
+-- Source: ADMCEF.V_SCEF_REQUEST_TABLEAU
+-- Fields: E1, E2, E3, E4, E8, E9, E21, E22, E23
+
 SELECT DISTINCT
-    se.request_id       AS ATTRIBUTE_ADJUSTMENT_ID,
-    se.request_id       AS RECORD_ID,
-    se.COB_DATE         AS COB_DATE,
-    se.CREDIT_OFFICER   AS CHECKER_SOEID,
-    se.REQUEST_CREATOR  AS MAKER_SOEID,
-    se.enter_time       AS POSTED_DATE,
-    '161534'            AS ADJUSTING_SYSTEM,
-    'Daily'             AS FREQUENCY,
-    'Closed'            AS EVENT_STATUS,
-    'Recurring'         AS RECURRENCE,
-    'Manual'            AS ADJUSTMENT_METHOD,
-    'Overwrite Missing or Inaccurate Data'           AS ADJUSTMENT_TYPE,
-    'Risk User Adjustment - Stress Exposure - Trade' AS REASON_CODE
-FROM SCEF_STRESS_EXPOSURE se
-WHERE TO_CHAR(se.COB_DATE, 'YYYYMMDD') = ?
-  AND se.STRESS_IMPACT_OVERRIDE IS NOT NULL
-ORDER BY se.request_id
+    TRIM(t.request_id)                                         AS EVENT_ID,           -- E1
+    'Manual'                                                   AS ADJUSTMENT_METHOD,  -- E2
+    'Overwrite Missing or Inaccurate Data'                     AS ADJUSTMENT_TYPE,    -- E3
+    'Risk User Adjustment - Stress Exposure - Trade'           AS REASON_CODE,        -- E4
+    'Closed'                                                   AS EVENT_STATUS,       -- E8
+    '161534'                                                   AS ADJUSTING_SYSTEM,   -- E9
+    'Daily'                                                    AS FREQUENCY,          -- E21
+    TRIM(t.REQUEST_CREATOR)                                    AS REQUESTOR_SOEID,    -- E22
+    TO_CHAR(CAST(t.enter_time AS DATE), 'YYYYMMDD')            AS COB_DATE            -- E23
+FROM ADMCEF.V_SCEF_REQUEST_TABLEAU t
+WHERE t.request_type = 'NSE Override'
+  AND t.status       = 'Approved'
+ORDER BY TRIM(t.request_id)

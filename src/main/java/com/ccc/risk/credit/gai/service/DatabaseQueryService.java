@@ -20,12 +20,8 @@ import java.util.stream.Collectors;
 /**
  * Executes SQL queries against the SCEF Oracle datasource.
  *
- * <p>Explicitly wired to {@code scefDataSource} via {@code @Qualifier} so there
- * is no ambiguity now that there are two datasources (Oracle + H2). The H2
- * datasource is reserved for Spring Batch metadata and must never be used here.
- *
  * <p>SQL files are loaded from {@code classpath:sql/{feedName}_{category}_query.sql}.
- * Each SQL accepts a single positional {@code ?} parameter for the COB date.
+ * No query parameters are used — all records are returned for the configured feed type.
  */
 @Slf4j
 @Service
@@ -40,10 +36,11 @@ public class DatabaseQueryService {
     public List<FeedRecord> executeQuery(FeedDefinition definition, String category, String cobDate) {
         String sql = loadSql(definition.getFeedName(), category);
 
-        log.info("Executing SQL for feed='{}' category='{}' cobDate='{}'",
-                definition.getFeedName(), category, cobDate);
+        log.info("Executing SQL for feed='{}' category='{}'",
+                definition.getFeedName(), category);
 
-        List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql, cobDate);
+        // No parameters — SQL has no date filter, returns all records
+        List<Map<String, Object>> rows = jdbcTemplate.queryForList(sql);
 
         log.info("Retrieved {} rows for {}/{}", rows.size(), definition.getFeedName(), category);
 

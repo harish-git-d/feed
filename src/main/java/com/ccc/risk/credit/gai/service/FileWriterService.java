@@ -14,7 +14,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
 /**
@@ -26,14 +25,12 @@ import java.util.zip.GZIPOutputStream;
  *   D|val1|val2|val3          ← one detail row per record
  *   T|{cobDate}|{count}       ← trailer row
  * </pre>
+ * Data files are gzip-compressed when {@code gai.gzip-enabled=true} (default).
  *
- * <p>Control file format:
+ * <p>Control file format (.ctrl — plain text, never gzipped):
  * <pre>
  *   T|{cobDate}|{totalRecordCount}
  * </pre>
- *
- * <p>All files are optionally gzip-compressed (controlled by
- * {@code gai.gzip-enabled}, default {@code true}).
  */
 @Slf4j
 @Service
@@ -53,44 +50,33 @@ public class FileWriterService {
 
         long recordCount = 0;
 
-        try (BufferedWriter writer = openWriter(outputPath)) {
-
-            // Header: H|field1|field2|...
-            writer.write(buildHeader(definition));
+        try (BufferedWriter writer = openGzipWriter(outputPath)) {
+            writer.write(buildHeader(definition, fileType));
             writer.newLine();
 
-            // Detail rows: D|val1|val2|...
             for (FeedRecord record : records) {
-                writer.write(toDetailLine(definition, record));
+                writer.write(toDetailLine(definition, record, fileType));
                 writer.newLine();
                 recordCount++;
             }
 
-            // Trailer: T|YYYYMMDD|recordCount
             writer.write(buildTrailer(definition, recordCount));
             writer.newLine();
 
         } catch (IOException e) {
-            throw new IllegalStateException("Failed to write " + fileType + " file: " + outputPath, e);
+            throw new IllegalStateException(
+                    "Failed to write " + fileType + " file: " + outputPath, e);
         }
 
         long fileSize = safeFileSize(outputPath);
         log.info("Wrote {} file: {} ({} records, {} bytes)", fileType, fileName, recordCount, fileSize);
-
         return new FileMetadata(fileName, fileType, recordCount, fileSize, outputPath.toString());
     }
 
     // -------------------------------------------------------------------------
-    // Control file
+    // Control file — plain text .ctrl, never gzipped
     // -------------------------------------------------------------------------
 
-    /**
-     * Writes the GAI control/trigger file.
-     *
-     * <p>Format: {@code T|{cobDate}|{totalRecordCount}}
-     * where totalRecordCount is the sum of records across all delivered data files.
-     * The control file is sent last — GAI uses it as the processing trigger.
-     */
     public FileMetadata writeControlFile(String fileName, FeedDefinition definition,
                                           List<FileMetadata> dataFiles) {
         Path outputPath = resolveOutputPath(fileName);
@@ -100,12 +86,12 @@ public class FileWriterService {
                 .mapToLong(FileMetadata::getRecordCount)
                 .sum();
 
-        // T|cobDate|totalRecordCount  (matches GAI 2.0 spec trailer format)
+        // Plain text — T|cobDate|totalRecordCount
         String content = "T" + definition.getDelimiter()
                        + normaliseCobDate() + definition.getDelimiter()
                        + totalRecords + "\n";
 
-        try (BufferedWriter writer = openWriter(outputPath)) {
+        try (BufferedWriter writer = openPlainWriter(outputPath)) {
             writer.write(content);
         } catch (IOException e) {
             throw new IllegalStateException("Failed to write control file: " + outputPath, e);
@@ -113,7 +99,6 @@ public class FileWriterService {
 
         long fileSize = safeFileSize(outputPath);
         log.info("Wrote CONTROL file: {} (totalRecords={}, {} bytes)", fileName, totalRecords, fileSize);
-
         return new FileMetadata(fileName, "CONTROL", totalRecords, fileSize, outputPath.toString());
     }
 
@@ -121,32 +106,48 @@ public class FileWriterService {
     // Private helpers
     // -------------------------------------------------------------------------
 
-    private String buildHeader(FeedDefinition definition) {
-        // H|field1|field2|field3|...
-        List<String> fields = definition.getRecordFields();
+    private String buildHeader(FeedDefinition definition, String fileType) {
+        List<String> fields = getFieldsForType(definition, fileType);
         return "H" + definition.getDelimiter()
                + String.join(definition.getDelimiter(), fields);
     }
 
     private String buildTrailer(FeedDefinition definition, long count) {
-        // T|cobDate|recordCount
         return "T" + definition.getDelimiter()
                + normaliseCobDate() + definition.getDelimiter()
                + count;
     }
 
-    private String toDetailLine(FeedDefinition definition, FeedRecord record) {
+    private String toDetailLine(FeedDefinition definition, FeedRecord record, String fileType) {
+        List<String> fields = getFieldsForType(definition, fileType);
         StringBuilder sb = new StringBuilder("D");
-        for (String field : definition.getRecordFields()) {
+        for (String field : fields) {
             sb.append(definition.getDelimiter());
             String val = record.getValue(field);
-            // Escape embedded pipe characters
             sb.append(val != null ? val.replace("|", "\\|") : "");
         }
         return sb.toString();
     }
 
-    private BufferedWriter openWriter(Path path) throws IOException {
+    /**
+     * Returns the correct field list based on file type (EVENT / RECORD / ATTRIBUTE).
+     * Falls back to recordFields for backward compatibility.
+     */
+    private List<String> getFieldsForType(FeedDefinition definition, String fileType) {
+        return switch (fileType.toUpperCase()) {
+            case "EVENT"     -> definition.getEventFields()     != null
+                                ? definition.getEventFields()
+                                : definition.getRecordFields();
+            case "RECORD"    -> definition.getRecordFields();
+            case "ATTRIBUTE" -> definition.getAttributeFields() != null
+                                ? definition.getAttributeFields()
+                                : definition.getRecordFields();
+            default          -> definition.getRecordFields();
+        };
+    }
+
+    /** Opens a gzip-compressed writer for data files. */
+    private BufferedWriter openGzipWriter(Path path) throws IOException {
         OutputStream fileStream = Files.newOutputStream(path);
         OutputStream out = properties.isGzipEnabled()
                 ? new GZIPOutputStream(new BufferedOutputStream(fileStream, 8192))
@@ -154,14 +155,20 @@ public class FileWriterService {
         return new BufferedWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8));
     }
 
+    /** Opens a plain (non-gzipped) writer for control files. */
+    private BufferedWriter openPlainWriter(Path path) throws IOException {
+        return new BufferedWriter(new OutputStreamWriter(
+                new BufferedOutputStream(Files.newOutputStream(path), 8192),
+                StandardCharsets.UTF_8));
+    }
+
     private Path resolveOutputPath(String fileName) {
         return Paths.get(properties.getOutputDirectory(), fileName);
     }
 
     private void ensureDirectoryExists(Path directory) {
-        try {
-            Files.createDirectories(directory);
-        } catch (IOException e) {
+        try { Files.createDirectories(directory); }
+        catch (IOException e) {
             throw new IllegalStateException("Unable to create output directory: " + directory, e);
         }
     }
@@ -171,13 +178,7 @@ public class FileWriterService {
         catch (IOException e) { return 0L; }
     }
 
-    /** Normalises cobDate from YYYY-MM-DD to YYYYMMDD for use in file content. */
     private String normaliseCobDate() {
         return properties.getCobDate().replace("-", "");
-    }
-
-    private String extractBusinessUnit() {
-        String appShortName = properties.getAppShortName();
-        return appShortName.contains("_") ? appShortName.split("_")[0] : appShortName;
     }
 }

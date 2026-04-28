@@ -1,30 +1,34 @@
--- SWWR Recovery Record Query
+-- SCEF GAI Feed: swwr-recovery RECORD
+-- Fields: R1-R28
+-- TODO: confirm REQUEST_TYPE_DESC value
+
 SELECT
-    'R' as H,
-    sr.RECOVERY_ID as ADJ_INVENTORY_ID,
-    sr.RECOVERY_UPLOAD_ID as ADJUSTMENT_UPLOAD_ID,
-    'SWWR Recovery Adjustment' as ADJUSTMENT_TYPE,
-    TO_CHAR(sr.EFFECTIVE_DATE, 'YYYY-MM-DD') as EFFECTIVE_DATE,
-    TO_CHAR(sr.POSTED_DATE, 'YYYY-MM-DD') as POSTED_DATE,
-    sr.CHECKER_SOEID,
-    sr.MAKER_SOEID,
-    'SWWR_RECOVERY' as ATTRIBUTE_NAME,
-    sr.ORIGINAL_AMOUNT as OLD_VALUE,
-    sr.RECOVERY_AMOUNT as NEW_VALUE,
-    '161534' as ORIGINAL_CSI,
-    sr.RECOVERY_STATUS as ADJUSTMENT_POSTING_STATUS,
-    sr.RECOVERY_CCY as TRANSACTION_CCY,
-    sr.RECOVERY_METHOD as ADJUSTMENT_METHOD,
-    sr.REASON_CODE,
-    sr.SUB_REASON_CODE,
-    sr.RECOVERY_STATUS as EVENT_STATUS,
-    'MONTHLY' as RECURRENCE,
-    'SCEF' as ADJUSTING_SYSTEM,
-    'M' as FREQUENCY,
-    sr.REQUESTOR_SOEID,
-    sr.ACCOUNT_ID as STANDARD_ACCOUNT,
-    sr.BUSINESS_UNIT as FRS_BU,
-    sr.BALANCE_TYPE
-FROM SWWR_RECOVERY sr
-WHERE sr.COB_DATE = TO_DATE(:cobDate, 'YYYY-MM-DD')
-ORDER BY sr.RECOVERY_ID
+    r.REQUEST_ID                                               AS RECORD_ID,          -- R1
+    TRIM('NA')                                                 AS RECORD_TYPE,        -- R2
+    TRIM(r.CURRENCY_CD)                                        AS TRANSACTION_CCY,    -- R3
+    '161534'                                                   AS ORIGINAL_CSI,       -- R4
+    TRIM('NA')                                                 AS ORIGINAL_FEED_ID,   -- R5
+    TRIM(r.LV_CODE)                                            AS LVID,               -- R6
+    'Posted'                                                   AS ADJUSTMENT_POSTING_STATUS, -- R7
+    TRIM('NA')                                                 AS PRODUCT_ATTRIBUTE1, -- R8
+    TRIM('NA')                                                 AS PRODUCT_ATTRIBUTE2, -- R9
+    TRIM('NA')                                                 AS ESP,                -- R10
+    TRIM('NA')                                                 AS EPT,                -- R11
+    TRIM('NA')                                                 AS ONBALANCE_TRANSACTION_CCY, -- R16
+    TRIM('NA')                                                 AS ONBALANCE_USD,      -- R17
+    TRIM('NA')                                                 AS OFFBALANCE_TRANSACTION_CCY, -- R18
+    TRIM('NA')                                                 AS OFFBALANCE_USD,     -- R19
+    TRIM('NA')                                                 AS PNL_TRANSACTION_CCY, -- R20
+    TRIM('NA')                                                 AS PNL_USD,            -- R21
+    TRIM('NA')                                                 AS NOTIONAL_TRANSACTION_CCY, -- R22
+    TRIM('NA')                                                 AS NOTIONAL_USD,       -- R23
+    TRIM('NA')                                                 AS SUPPLEMENTAL_BALANCE_CCY, -- R24
+    TRIM('NA')                                                 AS SUPPLEMENTAL_BALANCE_USD, -- R25
+    TRIM('NA')                                                 AS UIPID,              -- R26
+    TRIM(r.UITID)                                              AS UITID,              -- R27
+    TO_CHAR(CAST(r.COB_DATE AS DATE), 'YYYYMMDD')              AS COB_DATE            -- R28
+FROM ADMCEF.SCEF_REQUEST r
+JOIN ADMCEF.SCEF_REQUEST_TYPE rt ON r.REQUEST_TYPE = rt.REQUEST_TYPE
+WHERE rt.REQUEST_TYPE_DESC = 'TODO_CONFIRM'
+  AND r.STATUS = 2
+ORDER BY r.REQUEST_ID

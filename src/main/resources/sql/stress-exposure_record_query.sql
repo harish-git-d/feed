@@ -1,26 +1,33 @@
 -- SCEF GAI Feed: stress-exposure RECORD
--- One record row per trade (contract_key) for the given COB date.
+-- Source: ADMCEF.V_SCEF_REQUEST_TABLEAU
+-- Fields: R1-R28
+
 SELECT
-    se.request_id                                    AS ATTRIBUTE_ADJUSTMENT_ID,
-    se.contract_key                                  AS RECORD_ID,
-    'Stress Exposure'                                AS ATTRIBUTE_NAME,
-    se.last_update_time                              AS EFFECTIVE_DATE,
-    se.enter_time                                    AS POSTED_DATE,
-    se.CREDIT_OFFICER                                AS CHECKER_SOEID,
-    se.REQUEST_CREATOR                               AS MAKER_SOEID,
-    'Manual'                                         AS ADJUSTMENT_METHOD,
-    'Overwrite Missing or Inaccurate Data'           AS ADJUSTMENT_TYPE,
-    'Risk User Adjustment - Stress Exposure - Trade' AS REASON_CODE,
-    '161534'                                         AS ADJUSTING_SYSTEM,
-    'Daily'                                          AS FREQUENCY,
-    se.REQUEST_CREATOR                               AS REQUESTOR_SOEID,
-    se.COB_DATE                                      AS COB_DATE,
-    se.LV_CODE                                       AS LVID,
-    se.UITID                                         AS UITID,
-    '161534'                                         AS ORIGINAL_CSI,
-    'USD'                                            AS TRANSACTION_CCY,
-    'Posted'                                         AS ADJUSTMENT_POSTING_STATUS
-FROM SCEF_STRESS_EXPOSURE se
-WHERE TO_CHAR(se.COB_DATE, 'YYYYMMDD') = ?
-  AND se.STRESS_IMPACT_OVERRIDE IS NOT NULL
-ORDER BY se.request_id, se.contract_key
+    TRIM(t.contract_key)                                       AS RECORD_ID,          -- R1
+    TRIM('NA')                                                 AS RECORD_TYPE,        -- R2
+    'USD'                                                      AS TRANSACTION_CCY,    -- R3
+    '161534'                                                   AS ORIGINAL_CSI,       -- R4
+    TRIM('NA')                                                 AS ORIGINAL_FEED_ID,   -- R5
+    TRIM(t.uitid)                                              AS LVID,               -- R6
+    'Posted'                                                   AS ADJUSTMENT_POSTING_STATUS, -- R7
+    TRIM('NA')                                                 AS PRODUCT_ATTRIBUTE1, -- R8
+    TRIM('NA')                                                 AS PRODUCT_ATTRIBUTE2, -- R9
+    TRIM('NA')                                                 AS ESP,                -- R10
+    TRIM('NA')                                                 AS EPT,                -- R11
+    TRIM('NA')                                                 AS ONBALANCE_TRANSACTION_CCY, -- R16
+    TRIM('NA')                                                 AS ONBALANCE_USD,      -- R17
+    TRIM('NA')                                                 AS OFFBALANCE_TRANSACTION_CCY, -- R18
+    TRIM('NA')                                                 AS OFFBALANCE_USD,     -- R19
+    TRIM('NA')                                                 AS PNL_TRANSACTION_CCY, -- R20
+    TRIM('NA')                                                 AS PNL_USD,            -- R21
+    TRIM('NA')                                                 AS NOTIONAL_TRANSACTION_CCY, -- R22
+    TRIM('NA')                                                 AS NOTIONAL_USD,       -- R23
+    TRIM('NA')                                                 AS SUPPLEMENTAL_BALANCE_CCY, -- R24
+    TRIM('NA')                                                 AS SUPPLEMENTAL_BALANCE_USD, -- R25
+    TRIM('NA')                                                 AS UIPID,              -- R26
+    TRIM(t.uitid)                                              AS UITID,              -- R27
+    TO_CHAR(CAST(t.enter_time AS DATE), 'YYYYMMDD')            AS COB_DATE            -- R28
+FROM ADMCEF.V_SCEF_REQUEST_TABLEAU t
+WHERE t.request_type = 'NSE Override'
+  AND t.status       = 'Approved'
+ORDER BY TRIM(t.request_id), TRIM(t.contract_key)
