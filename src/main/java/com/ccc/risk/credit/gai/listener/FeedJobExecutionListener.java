@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobExecutionListener;
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
@@ -32,16 +31,11 @@ import java.util.List;
  */
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class FeedJobExecutionListener implements JobExecutionListener {
 
     private final FeedProperties feedProperties;
     private final JavaMailSender mailSender;
-
-    public FeedJobExecutionListener(FeedProperties feedProperties,
-                                    @Autowired(required = false) JavaMailSender mailSender) {
-        this.feedProperties = feedProperties;
-        this.mailSender = mailSender;
-    }
 
     // -------------------------------------------------------------------------
     // JobExecutionListener
