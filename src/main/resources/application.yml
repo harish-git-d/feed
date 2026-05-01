@@ -38,6 +38,11 @@ gai:
   file-timestamp:       ${GAI_FILE_TIMESTAMP:}
   gzip-enabled:         ${GAI_GZIP_ENABLED:true}
 
+  # Date format pattern applied to all date columns in output files.
+  # Uses Java SimpleDateFormat patterns.
+  # Examples: MMddyyyy | yyyyMMdd | MM/dd/yyyy | yyyy-MM-dd
+  date-format:          ${GAI_DATE_FORMAT:MMddyyyy}
+
   sftp:
     enabled:          ${GAI_SFTP_ENABLED:false}
     host:             ${GAI_SFTP_HOST:}

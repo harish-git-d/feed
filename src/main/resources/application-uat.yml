@@ -4,26 +4,20 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     hikari:
-      maximum-pool-size: 10
+      maximum-pool-size: 15
 
 gai:
-  output-directory: ./dev-output
-  gzip-enabled: false
+  output-directory:
   sftp:
-    enabled: false
+    enabled: true
     host:
     port:             22
     username:
     private-key-path: ${SFTP_PRIVATE_KEY_PATH:}
-    # Key file received: opiemdv@clmwiemap1d (attached in email)
+    # Key file received: opiemua@clmwiemap6u (attached in email)
     known-hosts-path: ${SFTP_KNOWN_HOSTS_PATH:}
     remote-directory:
 
   notification:
-    enabled: false
-
-logging:
-  level:
-    com.ccc.risk.credit.gai: DEBUG
-    org.springframework.batch: DEBUG
-    org.springframework.jdbc.core: DEBUG
+    enabled: true
+    to: ${GAI_NOTIFY_TO}

@@ -13,7 +13,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.zip.GZIPOutputStream;
 
 /**
@@ -25,11 +28,22 @@ import java.util.zip.GZIPOutputStream;
  *   D|val1|val2|val3          ← one detail row per record
  *   T|{cobDate}|{count}       ← trailer row
  * </pre>
- * Data files are gzip-compressed when {@code gai.gzip-enabled=true} (default).
  *
  * <p>Control file format (.ctrl — plain text, never gzipped):
  * <pre>
  *   T|{cobDate}|{totalRecordCount}
+ * </pre>
+ *
+ * <p><b>Date formatting:</b> Columns listed in {@link FeedDefinition#getDateColumns()}
+ * are formatted using the pattern configured at {@code gai.date-format}
+ * (default {@code MMddyyyy}). Change the format in application YAML without
+ * any code changes:
+ * <pre>
+ *   gai:
+ *     date-format: MMddyyyy        # → 06122024
+ *     # date-format: yyyyMMdd      # → 20240612
+ *     # date-format: MM/dd/yyyy    # → 06/12/2024
+ *     # date-format: yyyy-MM-dd    # → 2024-06-12
  * </pre>
  */
 @Slf4j
@@ -48,6 +62,7 @@ public class FileWriterService {
         Path outputPath = resolveOutputPath(fileName);
         ensureDirectoryExists(outputPath.getParent());
 
+        SimpleDateFormat sdf = buildDateFormatter();
         long recordCount = 0;
 
         try (BufferedWriter writer = openGzipWriter(outputPath)) {
@@ -55,7 +70,7 @@ public class FileWriterService {
             writer.newLine();
 
             for (FeedRecord record : records) {
-                writer.write(toDetailLine(definition, record, fileType));
+                writer.write(toDetailLine(definition, record, fileType, sdf));
                 writer.newLine();
                 recordCount++;
             }
@@ -86,7 +101,6 @@ public class FileWriterService {
                 .mapToLong(FileMetadata::getRecordCount)
                 .sum();
 
-        // Plain text — T|cobDate|totalRecordCount
         String content = "T" + definition.getDelimiter()
                        + normaliseCobDate() + definition.getDelimiter()
                        + totalRecords + "\n";
@@ -118,35 +132,80 @@ public class FileWriterService {
                + count;
     }
 
-    private String toDetailLine(FeedDefinition definition, FeedRecord record, String fileType) {
-        List<String> fields = getFieldsForType(definition, fileType);
+    private String toDetailLine(FeedDefinition definition, FeedRecord record,
+                                String fileType, SimpleDateFormat sdf) {
+        List<String> fields   = getFieldsForType(definition, fileType);
+        Set<String>  dateCols = definition.getDateColumns();
+
         StringBuilder sb = new StringBuilder("D");
         for (String field : fields) {
             sb.append(definition.getDelimiter());
             String val = record.getValue(field);
-            sb.append(val != null ? val.replace("|", "\\|") : "");
+            // Apply date formatting if this column is a date column and has a value
+            if (dateCols != null && dateCols.contains(field)
+                    && val != null && !val.isBlank() && !val.equals("NA")) {
+                val = formatDateValue(val, sdf);
+            }
+            if (val != null) {
+                sb.append(val.replace("|", "\\|"));
+            }
         }
         return sb.toString();
     }
 
     /**
-     * Returns the correct field list based on file type (EVENT / RECORD / ATTRIBUTE).
-     * Falls back to recordFields for backward compatibility.
+     * Attempts to parse a raw date/timestamp string and reformat it using
+     * the configured pattern. Falls back to the raw value if parsing fails.
+     *
+     * <p>Oracle JDBC returns timestamps as strings like:
+     * {@code 2024-06-12 11:40:55.917} or {@code 2024-06-12 00:00:00.0}
      */
+    private String formatDateValue(String raw, SimpleDateFormat targetFmt) {
+        // Patterns Oracle JDBC commonly returns
+        String[] oraclePatterns = {
+            "yyyy-MM-dd HH:mm:ss.SSS",
+            "yyyy-MM-dd HH:mm:ss.S",
+            "yyyy-MM-dd HH:mm:ss",
+            "yyyy-MM-dd",
+            "MM/dd/yyyy HH:mm:ss",
+            "MM/dd/yyyy"
+        };
+        for (String pattern : oraclePatterns) {
+            try {
+                SimpleDateFormat parser = new SimpleDateFormat(pattern);
+                parser.setLenient(false);
+                Date parsed = parser.parse(raw);
+                return targetFmt.format(parsed);
+            } catch (Exception ignored) {
+                // try next pattern
+            }
+        }
+        // Could not parse — return raw value as-is
+        log.debug("Could not parse date value '{}' — writing as-is", raw);
+        return raw;
+    }
+
+    private SimpleDateFormat buildDateFormatter() {
+        String pattern = properties.getDateFormat();
+        try {
+            return new SimpleDateFormat(pattern);
+        } catch (IllegalArgumentException e) {
+            log.warn("Invalid date-format '{}' — falling back to MMddyyyy", pattern);
+            return new SimpleDateFormat("MMddyyyy");
+        }
+    }
+
     private List<String> getFieldsForType(FeedDefinition definition, String fileType) {
         return switch (fileType.toUpperCase()) {
             case "EVENT"     -> definition.getEventFields()     != null
-                                ? definition.getEventFields()
-                                : definition.getRecordFields();
+                                ? definition.getEventFields()     : definition.getRecordFields();
             case "RECORD"    -> definition.getRecordFields();
             case "ATTRIBUTE" -> definition.getAttributeFields() != null
-                                ? definition.getAttributeFields()
-                                : definition.getRecordFields();
+                                ? definition.getAttributeFields() : definition.getRecordFields();
             default          -> definition.getRecordFields();
         };
     }
 
-    /** Opens a gzip-compressed writer for data files. */
     private BufferedWriter openGzipWriter(Path path) throws IOException {
         OutputStream fileStream = Files.newOutputStream(path);
         OutputStream out = properties.isGzipEnabled()
@@ -155,7 +214,6 @@ public class FileWriterService {
         return new BufferedWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8));
     }
 
-    /** Opens a plain (non-gzipped) writer for control files. */
     private BufferedWriter openPlainWriter(Path path) throws IOException {
         return new BufferedWriter(new OutputStreamWriter(
                 new BufferedOutputStream(Files.newOutputStream(path), 8192),
@@ -174,8 +232,7 @@ public class FileWriterService {
     }
 
     private long safeFileSize(Path path) {
-        try { return Files.size(path); }
-        catch (IOException e) { return 0L; }
+        try { return Files.size(path); } catch (IOException e) { return 0L; }
     }
 
     private String normaliseCobDate() {

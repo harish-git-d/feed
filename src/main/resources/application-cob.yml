@@ -3,6 +3,9 @@ spring:
     url:      jdbc:oracle:thin:@:1521/
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
 
 gai:
   output-directory:
@@ -11,10 +14,11 @@ gai:
     host:
     port:             22
     username:
-    private-key-path: ${SFTP_PRIVATE_KEY_PATH:}
-    # Key file received: opiemdv@clmwiemap1d (SIT shares DEV SFTP)
+    private-key-path: ${SFTP_PRIVATE_KEY_PATH:/opt/scef/keys/}
+    # Key file received: opiempr@clmwiemap7p (attached in email)
     known-hosts-path: ${SFTP_KNOWN_HOSTS_PATH:}
     remote-directory:
 
   notification:
-    enabled: false
+    enabled: true
+    to: ${GAI_NOTIFY_TO}
