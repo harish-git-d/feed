@@ -1,0 +1,20 @@
+spring:
+  datasource:
+    url:      jdbc:oracle:thin:@:1521/
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+gai:
+  output-directory:
+  sftp:
+    enabled: true
+    host:
+    port:             22
+    username:
+    private-key-path: ${SFTP_PRIVATE_KEY_PATH:}
+    # Key file received: opiemdv@clmwiemap1d (SIT shares DEV SFTP)
+    known-hosts-path: ${SFTP_KNOWN_HOSTS_PATH:}
+    remote-directory:
+
+  notification:
+    enabled: false

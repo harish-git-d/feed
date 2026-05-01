@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:scefTestDb;DB_CLOSE_DELAY=-1;MODE=Oracle
+    username: sa
+    password:
+  batch:
+    job:
+      enabled: false
+
+gai:
+  source-system-csi:   "161534"
+  source-system-name:  "SCEF"
+  app-short-name:      "CRC_SCEF"
+  region-instance:     "N"
+  source-indicator:    "SRC"
+  frequency:           "DLY"
+  file-type-indicator: "F"
+  output-directory:    ./target/test-output
+  feed-name:           stress-exposure
+  cob-date:            "20251231"
+  file-timestamp:      "20260122144002"
+  gzip-enabled:        false
+  sftp:
+    enabled: false
+  notification:
+    enabled: false
