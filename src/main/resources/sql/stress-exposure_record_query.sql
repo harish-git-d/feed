@@ -1,13 +1,15 @@
 -- SCEF GAI Feed: stress-exposure RECORD
 -- Source: ADMCEF.V_SCEF_REQUEST_TABLEAU
--- Full field list R1-R28
+-- R1 RECORD_ID = contract_key — must match A2 RECORD_ID in ATTRIBUTE file
+-- R2 RECORD_TYPE = 'T' (Trade)
+-- R5 ORIGINAL_FEED_ID = 'SCEF' (source system name)
 
-SELECT
+SELECT DISTINCT
     TRIM(t.contract_key)                                       AS RECORD_ID,             -- R1
-    TRIM('NA')                                                 AS RECORD_TYPE,           -- R2
+    'T'                                                        AS RECORD_TYPE,           -- R2  Trade
     'USD'                                                      AS TRANSACTION_CCY,       -- R3
     '161534'                                                   AS ORIGINAL_CSI,          -- R4
-    TRIM('NA')                                                 AS ORIGINAL_FEED_ID,      -- R5
+    'SCEF'                                                     AS ORIGINAL_FEED_ID,      -- R5  CRITICAL
     TRIM(t.uitid)                                              AS LVID,                  -- R6
     'Posted'                                                   AS ADJUSTMENT_POSTING_STATUS, -- R7
     TRIM('NA')                                                 AS PRODUCT_ATTRIBUTE1,    -- R8
@@ -30,9 +32,8 @@ SELECT
     TRIM('NA')                                                 AS SUPPLEMENTAL_USD,      -- R25
     TRIM('NA')                                                 AS UIPID,                 -- R26
     TRIM(t.uitid)                                              AS UITID,                 -- R27
-    t.enter_time            AS COB_DATE               -- R28
+    TO_CHAR(CAST(t.enter_time AS DATE), 'MMDDYYYY')            AS COB_DATE               -- R28
 FROM ADMCEF.V_SCEF_REQUEST_TABLEAU t
 WHERE t.request_type = 'NSE Override'
   AND t.status       = 'Approved'
-  AND TO_CHAR(se.COB_DATE, 'YYYYMMDD') = ?
-ORDER BY TRIM(t.request_id), TRIM(t.contract_key)
+ORDER BY TRIM(t.contract_key)

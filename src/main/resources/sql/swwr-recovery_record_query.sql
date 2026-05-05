@@ -1,12 +1,13 @@
--- SCEF GAI Feed: swwr-recovery RECORD — Full field list R1-R28
+-- SCEF GAI Feed: swwr-recovery RECORD
+-- R2 RECORD_TYPE = 'T', R5 ORIGINAL_FEED_ID = 'SCEF'
 -- TODO: confirm REQUEST_TYPE_DESC
 
-SELECT
+SELECT DISTINCT
     r.REQUEST_ID                                               AS RECORD_ID,             -- R1
-    TRIM('NA')                                                 AS RECORD_TYPE,           -- R2
+    'T'                                              AS RECORD_TYPE,           -- R2
     TRIM(r.CURRENCY_CD)                                        AS TRANSACTION_CCY,       -- R3
     '161534'                                                   AS ORIGINAL_CSI,          -- R4
-    TRIM('NA')                                                 AS ORIGINAL_FEED_ID,      -- R5
+    'SCEF'                                                     AS ORIGINAL_FEED_ID,      -- R5  CRITICAL
     TRIM(r.LV_CODE)                                            AS LVID,                  -- R6
     'Posted'                                                   AS ADJUSTMENT_POSTING_STATUS, -- R7
     TRIM('NA')                                                 AS PRODUCT_ATTRIBUTE1,    -- R8
@@ -29,7 +30,7 @@ SELECT
     TRIM('NA')                                                 AS SUPPLEMENTAL_USD,      -- R25
     TRIM('NA')                                                 AS UIPID,                 -- R26
     TRIM(r.UITID)                                              AS UITID,                 -- R27
-    r.COB_DATE              AS COB_DATE               -- R28
+    TO_CHAR(CAST(r.COB_DATE AS DATE), 'MMDDYYYY')              AS COB_DATE               -- R28
 FROM ADMCEF.SCEF_REQUEST r
 JOIN ADMCEF.SCEF_REQUEST_TYPE rt ON r.REQUEST_TYPE = rt.REQUEST_TYPE
 WHERE rt.REQUEST_TYPE_DESC = 'TODO_CONFIRM'

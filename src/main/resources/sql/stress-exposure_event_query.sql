@@ -1,6 +1,6 @@
 -- SCEF GAI Feed: stress-exposure EVENT
 -- Source: ADMCEF.V_SCEF_REQUEST_TABLEAU
--- Full field list E1-E24
+-- E1 EVENT_ID must match A1 in ATTRIBUTE file
 
 SELECT DISTINCT
     TRIM(t.request_id)                                         AS EVENT_ID,              -- E1
@@ -24,10 +24,9 @@ SELECT DISTINCT
     TRIM('NA')                                                 AS INC_NUMBER,            -- E19
     'Daily'                                                    AS FREQUENCY,             -- E21
     TRIM(t.REQUEST_CREATOR)                                    AS REQUESTOR_SOEID,       -- E22
-    t.enter_time            AS COB_DATE,              -- E23
-    t.enter_time            AS EVENT_DATE_AND_TIME    -- E24
+    TO_CHAR(CAST(t.enter_time AS DATE), 'MMDDYYYY')            AS COB_DATE,              -- E23
+    TO_CHAR(CAST(t.enter_time AS DATE), 'MMDDYYYY')            AS EVENT_DATE_AND_TIME    -- E24
 FROM ADMCEF.V_SCEF_REQUEST_TABLEAU t
 WHERE t.request_type = 'NSE Override'
   AND t.status       = 'Approved'
-  AND TO_CHAR(se.COB_DATE, 'YYYYMMDD') = ?
 ORDER BY TRIM(t.request_id)
